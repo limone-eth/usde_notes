@@ -1,0 +1,64 @@
+\BOOKMARK [1][-]{section.1}{Introduction \(Course motivation\)}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Data-driven Decision Making for Data-driven Organizations}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Solving problems with Big Data, Data Science and ... Data Engineering}{section.1}% 3
+\BOOKMARK [3][-]{subsubsection.1.2.1}{What's Big Data?}{subsection.1.2}% 4
+\BOOKMARK [3][-]{subsubsection.1.2.2}{What's Data Science}{subsection.1.2}% 5
+\BOOKMARK [3][-]{subsubsection.1.2.3}{What's Data Engineering}{subsection.1.2}% 6
+\BOOKMARK [1][-]{section.2}{No SQL Intro}{}% 7
+\BOOKMARK [2][-]{subsection.2.1}{Big Data Platforms: Architectures, Features and System}{section.2}% 8
+\BOOKMARK [3][-]{subsubsection.2.1.1}{Big Data vs Traditional Data}{subsection.2.1}% 9
+\BOOKMARK [3][-]{subsubsection.2.1.2}{The Concept of Data Lake}{subsection.2.1}% 10
+\BOOKMARK [3][-]{subsubsection.2.1.3}{Scalability}{subsection.2.1}% 11
+\BOOKMARK [2][-]{subsection.2.2}{ACID vs. BASE and SQL vs. NoSQL}{section.2}% 12
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Transactional Properties}{subsection.2.2}% 13
+\BOOKMARK [3][-]{subsubsection.2.2.2}{CAP Theorem}{subsection.2.2}% 14
+\BOOKMARK [3][-]{subsubsection.2.2.3}{ACID vs. BASE properties}{subsection.2.2}% 15
+\BOOKMARK [3][-]{subsubsection.2.2.4}{The NoSQL World}{subsection.2.2}% 16
+\BOOKMARK [1][-]{section.3}{Graph DB}{}% 17
+\BOOKMARK [2][-]{subsection.3.1}{Graph Theory}{section.3}% 18
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Useful definitions}{subsection.3.1}% 19
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Graph Abstract Data Type \(ADT\)}{subsection.3.1}% 20
+\BOOKMARK [2][-]{subsection.3.2}{Graph Databases}{section.3}% 21
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Advantages of Graph Databases}{subsection.3.2}% 22
+\BOOKMARK [2][-]{subsection.3.3}{Neo4J}{section.3}% 23
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Cypher}{subsection.3.3}% 24
+\BOOKMARK [1][-]{section.4}{Key-Value DB}{}% 25
+\BOOKMARK [2][-]{subsection.4.1}{How does a key-value database work?}{section.4}% 26
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Key Features}{subsection.4.1}% 27
+\BOOKMARK [2][-]{subsection.4.2}{Redis}{section.4}% 28
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Scaling Redis}{subsection.4.2}% 29
+\BOOKMARK [3][-]{subsubsection.4.2.2}{Redis topologies}{subsection.4.2}% 30
+\BOOKMARK [3][-]{subsubsection.4.2.3}{Redis Advantages}{subsection.4.2}% 31
+\BOOKMARK [2][-]{subsection.4.3}{Key-Value and Caching}{section.4}% 32
+\BOOKMARK [3][-]{subsubsection.4.3.1}{What is Caching?}{subsection.4.3}% 33
+\BOOKMARK [3][-]{subsubsection.4.3.2}{Memcached}{subsection.4.3}% 34
+\BOOKMARK [1][-]{section.5}{Big Column DB}{}% 35
+\BOOKMARK [2][-]{subsection.5.1}{Introduction}{section.5}% 36
+\BOOKMARK [3][-]{subsubsection.5.1.1}{Column wise vs. Row wise database}{subsection.5.1}% 37
+\BOOKMARK [3][-]{subsubsection.5.1.2}{Column storage}{subsection.5.1}% 38
+\BOOKMARK [2][-]{subsection.5.2}{Cassandra}{section.5}% 39
+\BOOKMARK [3][-]{subsubsection.5.2.1}{Cassandra Properties}{subsection.5.2}% 40
+\BOOKMARK [3][-]{subsubsection.5.2.2}{Gossip Protocol}{subsection.5.2}% 41
+\BOOKMARK [3][-]{subsubsection.5.2.3}{Replica Placement Strategies}{subsection.5.2}% 42
+\BOOKMARK [3][-]{subsubsection.5.2.4}{Write operation}{subsection.5.2}% 43
+\BOOKMARK [3][-]{subsubsection.5.2.5}{Read operation}{subsection.5.2}% 44
+\BOOKMARK [3][-]{subsubsection.5.2.6}{Cassandra Quorums and Consistency Levels}{subsection.5.2}% 45
+\BOOKMARK [3][-]{subsubsection.5.2.7}{Data model}{subsection.5.2}% 46
+\BOOKMARK [3][-]{subsubsection.5.2.8}{What about...SQL?}{subsection.5.2}% 47
+\BOOKMARK [2][-]{subsection.5.3}{Is Cassandra a good fit?}{section.5}% 48
+\BOOKMARK [1][-]{section.6}{Document-oriented DB}{}% 49
+\BOOKMARK [2][-]{subsection.6.1}{Why document-based?}{section.6}% 50
+\BOOKMARK [2][-]{subsection.6.2}{MongoDB}{section.6}% 51
+\BOOKMARK [3][-]{subsubsection.6.2.1}{Facts}{subsection.6.2}% 52
+\BOOKMARK [3][-]{subsubsection.6.2.2}{Data Model}{subsection.6.2}% 53
+\BOOKMARK [3][-]{subsubsection.6.2.3}{Queries}{subsection.6.2}% 54
+\BOOKMARK [3][-]{subsubsection.6.2.4}{CAP Theorem and Mongo}{subsection.6.2}% 55
+\BOOKMARK [1][-]{section.7}{Streaming Data Engineering}{}% 56
+\BOOKMARK [2][-]{subsection.7.1}{The Solution Space}{section.7}% 57
+\BOOKMARK [3][-]{subsubsection.7.1.1}{The Dimensions: Throughput vs. Latency vs. Message size}{subsection.7.1}% 58
+\BOOKMARK [3][-]{subsubsection.7.1.2}{Three Cases along a continuum}{subsection.7.1}% 59
+\BOOKMARK [2][-]{subsection.7.2}{The Batch Case}{section.7}% 60
+\BOOKMARK [2][-]{subsection.7.3}{The Continuous Case}{section.7}% 61
+\BOOKMARK [3][-]{subsubsection.7.3.1}{From Passive to Active DBMS and DSMS}{subsection.7.3}% 62
+\BOOKMARK [3][-]{subsubsection.7.3.2}{Event-based systems}{subsection.7.3}% 63
+\BOOKMARK [3][-]{subsubsection.7.3.3}{Service Oriented Architecture \(SOA\)}{subsection.7.3}% 64
