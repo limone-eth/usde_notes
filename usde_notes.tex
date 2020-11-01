@@ -1815,7 +1815,205 @@ Because processes now rely on eventual consistency, it is not typical to support
  \caption{How it works an event-driven architecture}
 \end{figure} 
 
+\section{EPL}
+\subsection{EPL and Esper}
+The \textbf{E}vent \textbf{P}rocessing \textbf{L}anguage (EPL) is a declarative language for dealing with high frequency time-based event data. It is grounded on DSMS approach:
+\begin{itemize}
+	\item Windowing
+	\item Relational select, join, aggregate
+	\item Relation-to-stream operators to produce output
+	\item Sub-queries
+\end{itemize}
+It implements and extends the SQL-standard and enables rich expressions over events and time. Furthermore, it also include complex event recognition abstraction, in particular for pattern detection.
+\nline
+It is offered by \href{https://www.espertech.com/esper/}{Esper}. \\
+The Esper compiler compiles EPL into byte code that can be saved in jar package file format for distribution and execution. The Esper runtime loads and executes byte code produced by the Esper compiler. The runtime provides a \textbf{highly scalable, memory-efficient, in-memory computing, minimal latency, real-time streaming-capable} processing engine for online and real-time arriving data and high-variety data, as well as for historical event analysis. 	\\
+It has several adapters for input/output: CSV, Java Message System in/out, API, DB, Socket and HTTP. In conclusion, Esper focuses on High Availability, ensuring that the state is recoverable in the case of failure.
+
+\subsection{Processing Model}
+It is built on four abstractions:
+\begin{itemize}
+	\item \textbf{Sources}
+	\begin{itemize}
+		\item Produce data items from sensors, trace files, etc.
+	\end{itemize}
+	\item \textbf{Registered EPL queries}
+	\begin{itemize}
+		\item Continuously executed against the data items produced by the sources
+	\end{itemize}
+	\item \textbf{Listeners}
+	\begin{itemize}
+		\item Receive data items from queries
+		\item Push data items to other queries
+	\end{itemize}
+	\item \textbf{Subscribers}
+	\begin{itemize}
+		\item Receive processed data tuples
+	\end{itemize}
+\end{itemize}
+The EPL processing model is continuous: Listeners to statements receive updated data as soon as the engine processes events for that statement, according to the statement's choice of event streams, retain clause restrictions, filters and output rates.
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=180pt]{images/epl-processing-model.png}\hspace*{\fill}
+ \caption{EPL processing model}
+\end{figure} 
+\paragraph{Running example:}
+Count the number of fires detected using a set of smoke and temperature sensors in the last 10 minutes. \\
+Events:
+\begin{itemize}
+	\item Smoke event: String sensor, boolean state
+	\item Temperature event: String sensor, double temperature
+	\item Fire event: String sensor, boolean smoke, double temperature
+\end{itemize}
+Condition:
+\begin{itemize}
+	\item Fire: at the same sensor $smoke$ followed by $temperature > 50$
+\end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=150pt]{images/epl-processing-model-ex.png}\hspace*{\fill}
+ \caption{EPL processing model - Fire example}
+\end{figure} 
+\pagebreak
+
+\subsection{Event types and Query syntax}
+Two ways to declare events:
+\begin{itemize}
+	\item EPL \textit{create schema clause}
+	\item Runtime configuration API \textit{addEventType}
+\end{itemize}
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/epl-declare}
+  \captionof{figure}{EPL - Declare event types}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/epl-query}
+  \captionof{figure}{EPL - Query syntax}
+\end{minipage}
+\nline
+EPL is similar to SQL... it uses \textit{selects, where, ...} \\
+Event streams and views instead of tables:
+\begin{itemize}
+	\item Views define the data available for the query
+	\item Views can represent windows over streams
+	\item Views can also sort events, derive statistics from event attributes, group events, ...
+\end{itemize}
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/epl-declare-ex}
+  \captionof{figure}{EPL - Declare event types example}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/epl-query-ex}
+  \captionof{figure}{EPL - Query syntax example}
+\end{minipage}
+
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/epl-windows.png}\hspace*{\fill}
+ \caption{EPL offers 4 types of windows that can be used to perform more customized queries.}
+\end{figure} 
+
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/epl-window-1}
+  \captionof{figure}{Window opened 4 seconds in the past. At t+8 e1@4 is discarded since is more than 4 seconds in the past.}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/epl-window-2}
+  \captionof{figure}{Each window is discarded after 4 seconds, and a new one is created.}
+\end{minipage}
+
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/epl-window-3.png}\hspace*{\fill}
+ \caption{The window counts the number of elements seen so far, allowing to store only the last 3 of them. That's why e1@1 is discarded when e4@9 is seen.}
+\end{figure} 
+
+
+\paragraph{Output clause} The output clause is optional in Esper. \\ It is used to control the output rate and suppress output events.
+
+\begin{figure}[ht!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/output-syntax}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/output-example}
+\end{minipage}
+\caption{Output can be used to control the advancement of sliding windows.}
+\end{figure}
+
+\subsection{Pattern Matching}
+An event pattern emits when one or more event occurrences match the pattern definition, which can include:
+\begin{itemize}
+	\item Constraints on the content of events
+	\item Constraints on the time of occurrence
+	\item Conditions for pattern creation
+\end{itemize}
+Content-based event selection:
+\begin{itemize}
+	\item $TempStream(sensor="S0", val>50)$
+\end{itemize}
+Time-based event observers specify time intervals or time schedules:
+\begin{itemize}
+	\item $timer:interval(10 seconds)$ fires after 10 seconds
+	\item $timer:at(5, *, *, *, *)$ every 5 minutes (ubuntu cron syntax)
+\end{itemize}
+\paragraph{Pattern matching operators}
+\begin{itemize}
+	\item Logical operators: \textit{and,or,not}
+	\item Temporal operators that operate on event order: $\rightarrow$ \textit{(followed-by)}
+	\item Creation/termination control: \textit{every, every-distinct, [num] and until} 
+	\item Guards filter out events and cause termination: \textit{timer:within, timer:withinmax and while-expression}
+\end{itemize}
+
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/pattern-matching-example.png}\hspace*{\fill}
+ \caption{EPL - Pattern Matching example. The result returns the name of sensors that match the specified pattern: whenever a sensor sees some smoke and after that the temperature becomes greater than 50, within an interval of at most 2 seconds.}
+\end{figure} 
+
+\paragraph{\uline{Every} expression}
+\begin{itemize}
+	\item When $expr$ evaluates true or false the pattern matching should-restart.
+	\item Without the \textbf{every} operator the pattern matching process does not re-start.
+\end{itemize}
+Examples:
+\begin{itemize}
+	\item $A$ - This pattern fires when encountering an A event and then stops
+	\item \textit{every A} - This pattern keeps firing when encountering A events, and does not stop
+\end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/events-sequence.png}\hspace*{\fill}
+ \caption{Example sequence of events.}
+\end{figure} 
+\begin{itemize}
+	\item \uline{\textit{every $(A \rightarrow B)$}} - Detect an event A followed by an event B: at the time when B occurs, the pattern matches and restarts looking for the next A event. \\
+	\textcolor{blue}{\textbf{Matches:} \\ $\{A1,B1\}, \{A2,B3\}, \{A4,B4\}$}
+	\item \uline{\textit{every $A \rightarrow B$}} - The pattern fires for every A followed by a B event.  \\
+	\textcolor{blue}{\textbf{Matches:} \\ $\{A1,B1\}, \{A2,B3\}, \{A3,B3\}, \{A4,B4\}$}
+	\item \uline{\textit{$A \rightarrow$ every $B$}} - The pattern fires for an A event followed by every B event. \\
+	\textcolor{blue}{\textbf{Matches:} \\ $\{A1,B1\}, \{A1,B2\}, \{A1,B3\}, \{A1,B4\}$}
+	\item \uline{\textit{every $A \rightarrow$ every $B$}} - The pattern fires for every A event followed by every B event. \\
+	\textcolor{blue}{\textbf{Matches:} $\{A1,B1\}, \{A1,B2\}, \{A1,B3\}, \{A1,B4\}, \{A2,B3\}, \{A2,B4\}, \{A3,B3\}, \{A3,B4\}, \{A4,B4\} $}
+\end{itemize}
+\pagebreak
+With the \textit{every} operator multiple (partial) instances of the same pattern can be active at the same time. Each instance can consume some resources when events enter the engine. For this reason is good practice to end pending instance whenever possible with:
+\begin{itemize}
+	\item the \textit{timer:within} construct
+	\item the \textit{and not} construct
+\end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/every-expr1.png}\hspace*{\fill}
+ \caption{The \textbf{and not} operator causes the sub-expression looking for {A1, B?} to end when A2 arrives.}
+\end{figure} 
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/every-expr2.png}\hspace*{\fill}
+ \caption{The \textbf{timer:within} operator causes the sub-expression looking for {A1, B?} to end after 2 seconds}
+\end{figure} 
 \clearpage
+
 
 \bibliographystyle{unsrt}  
 %\bibliography{references}  %%% Remove comment to use the external .bib file (using bibtex).
