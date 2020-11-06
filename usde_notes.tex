@@ -2012,6 +2012,154 @@ With the \textit{every} operator multiple (partial) instances of the same patter
  \hfill \includegraphics[width=200pt]{images/every-expr2.png}\hspace*{\fill}
  \caption{The \textbf{timer:within} operator causes the sub-expression looking for {A1, B?} to end after 2 seconds}
 \end{figure} 
+\pagebreak
+\section{Kafka}
+\subsection{Kafka Basics}
+\subsubsection{Kafka in a nutshell}
+Kafka is a distributed system consisting of \textbf{servers} and \textbf{clients} that communicate via a high-performance TCP network protocol. It can be deployed on bare-metal hardware, virtual machines, and containers in on-premise as well as cloud environments. 
+\begin{itemize}
+	\item \textbf{Servers}: Kafka is run as a cluster of one or more servers that can span multiple datacenters or cloud regions. Some of these servers form the storage layer, called the brokers. Other servers run Kafka Connect to continuously import and export data as event streams to integrate Kafka with your existing systems such as relational databases as well as other Kafka clusters. To let you implement mission-critical use cases, a Kafka cluster is highly scalable and fault-tolerant: if any of its servers fails, the other servers will take over their work to ensure continuous operations without any data loss.
+	\item \textbf{Clients}: they allow you to write distributed applications and microservices that read, write, and process streams of events in parallel, at scale, and in a fault-tolerant manner even in the case of network problems or machine failures. Kafka ships with some such clients included, which are augmented by dozens of clients provided by the Kafka community: clients are available for Java and Scala including the higher-level Kafka Streams library, for Go, Python, C/C++, and many other programming languages as well as REST APIs.
+\end{itemize}
+\subsubsection{Main Concepts and Terminology}
+In Kafka, an \textbf{event} records the fact that "something happened" in the world or in your business. It is also called record or message in the documentation. When you read or write data to Kafka, you do this in the form of events. Conceptually, an event has a key, value, timestamp, and optional metadata headers. Here's an example event:
+\begin{itemize}
+	\item \uline{Event key}: "Alice"
+	\item \uline{Event value}: "Made a payment of \$200 to Bob"
+	\item \uline{Event timestamp}: "Jun. 25, 2020 at 2:06 p.m."
+\end{itemize}
+\textbf{Producers} are those client applications that publish (write) events to Kafka, and \textbf{Consumers} are those that subscribe to (read and process) these events. Multiple consumers can be combined into a Consumer Group, which provide scaling capabilities. In a Consumer Group each consumer is assigned a subset of partitions for consumption. In Kafka, producers and consumers are fully decoupled and agnostic of each other, which is a key design element to achieve the high scalability that Kafka is known for. For example, producers never need to wait for consumers. Kafka provides various guarantees such as the ability to process events exactly-once.
+\nline
+Events are organized and durably stored in \textbf{topics}. A Topic is a category/feed name to which records are stored and published. An example topic name could be "payments".  Events in a topic can be read as often as needed—unlike traditional messaging systems, events are not deleted after consumption. Instead, you define for how long Kafka should retain your events through a per-topic configuration setting, after which old events will be discarded. Kafka's performance is effectively constant with respect to data size, so storing data for a long time is perfectly fine.
+\nline
+
+\textbf{Topics are partitioned}, meaning a topic is spread over a number of "buckets" located on different Kafka brokers. This distributed placement of your data is very important for scalability because it allows client applications to both read and write the data from/to many brokers at the same time. Indeed, partitions allow topics to be parallelized by splitting the data into a particular topic across multiple brokers. When a new event is published to a topic, it is actually appended to one of the topic's partitions. Events with the same event key (e.g., a customer or vehicle ID) are written to the same partition, and Kafka guarantees that any consumer of a given topic-partition will always read that partition's events in exactly the same order as they were written. \\
+There are two policies that can be used when assigning partitions:
+\begin{itemize}
+	\item \textbf{Sticky-Assignment ON}: when adding a new consumer to the group, nothing happens unless the system understand that is useful to assign one of the partitions to that consumer (e.g., if we have 4 partitions and 3 consumers, when adding a 4th consumer, the system assigns a partition to it, so that there are exactly one partition per consumer)
+	\item \textbf{Sticky-Assignment OFF}: when adding a new consumer to the group, it is assigned with a partition, even if it means detaching one partition from one of the other consumers (some consumers could remain without any partitions assigned)
+\end{itemize}
+\textcolor{blue}{Note that partitions can not be shared by consumers in the same consumer group.} 
+\nline
+A producer must know which partition to write to, this is not up to the broker. The simplest way is to use a Round-Robin strategy, in which the producer writes on each partition at turn. Another option is to use an hashing function over the event key to calculate the partition in which the record should go to. In this way, all records with the same key will arrive at the same partition. Before a producer can send any records, it has to request metadata about the cluster from the broker. The metadata contains information on which broker is the leader for each partition and a producer always writes to the partition leader. \\
+A common error when publishing records is setting the same key or null key for all records, which results in all records ending up in the same partition and you get an unbalanced topic.
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{images/kafka-topics}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{images/kafka-brokers}
+\end{minipage}
+	\caption{Kafka producers and consumers exchange messages through topics which are included within brokers.}
+\end{figure} 
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{images/kafka-topics-partitions}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{images/kafka-consumer-group}
+\end{minipage}
+	\caption{Using partitions, each broker can contain different topics and different partitions in order to improve availability (by replicating data) and scalability (by parallelizing message reading/writing). Moreover, consumer groups allow to scale the consumption process.}
+\end{figure} 
+\subsubsection{Kafka Internals}
+In Kafka, each partition is stored on the Broker's disk as one or more log files. Each message in the log is identified by its offset number. The write operations on the log files are performed in append mode, in this way the performance are not influenced by the file size (which may grow a lot!). 
+\nline
+Relevant notes:
+\begin{itemize}
+	\item Consumers can consume from different offset
+	\item Brokers are single threaded to guarantee consistency
+\end{itemize}
+
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/kafka-physical-partition2}\hspace*{\fill}
+ \caption{Consumer A after reading on offset 3, will read on offset 4. Consumer B can't read anything more, since 8 is the last offset that was written.}
+\end{figure}
+
+By default Kafka messages will be retained for seven days. By the way, the log retention is configurable per Broker by setting:
+\begin{itemize}
+	\item a time period
+	\item a size limit
+\end{itemize}
+When cleaning up a log there are two policies:
+\begin{itemize}
+	\item the \textbf{default policy} consists in deleting the oldest messages
+	\item an alternate policy is \textbf{log compaction}
+\end{itemize}
+
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/kafka-log-compaction}\hspace*{\fill}
+ \caption{A compacted log retains at least the last known message value for each key within the partition.}
+\end{figure} 
+
+In Kafka, \textbf{replication is implemented at the partition level}. The redundant unit of a topic partition is called a replica. Each partition usually has one or more replicas meaning that partitions contain messages that are replicated over a few Kafka brokers in the cluster. \\ Every partition (replica) has one server acting as a leader and the rest of them as followers. The leader replica handles all read-write requests for the specific partition and the followers replicate the leader. If the lead server fails, one of the follower servers becomes the leader by default. You should strive to have a good balance of leaders so each broker is a leader of an equal amount of partitions to distribute the load.
+\nline
+When a producer publishes a record to a topic, it is published to its leader. The leader appends the record to its commit log and increments its record offset. Kafka only exposes a record to a consumer after it has been committed and each piece of data that comes in will be stacked on the cluster.
+\nline
+Producers can control durability by requiring the leader a number of acknowledgments before considering the request complete:
+\begin{itemize}
+	\item \textbf{acks=0}: producer will not wait for any acknowledgment from the broker
+	\item \textbf{acks=1}: producer will wait until the leader has written the record to its local log (equal to eventual consistency - at least once sematics) 
+	\item \textbf{acks=all}: producer will wait until all all insync replicas have acknowledged receipt of the record
+\end{itemize}
+
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=100pt]{images/kafka-replication}\hspace*{\fill}
+ \caption{Fault tolerance via a Replicated Log}
+\end{figure} 
+
+\subsection{Avro and Schema Registry}
+\href{https://avro.apache.org/}{Apache Avro} is a binary serialization format. It relies on schemas (defined in JSON format) that define what fields are present and their type. Nested fields are supported as well as arrays. \\
+In Avro, data is defined with a self-describing schema allowing for:
+\begin{itemize}
+	\item code generation for serializers and de-serializers in multiple languages
+	\item type checking at write time
+\end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=150pt]{images/avro-schema-ex}\hspace*{\fill}
+ \caption{Avro schema example}
+\end{figure} 
+Avro supports schema evolutivity: you can have multiple versions of your schema, by adding or removing fields. A little care needs to be taken to indicate fields as optional to ensure backward or forward compatibility. Since Avro converts data into arrays of bytes, and that Kafka messages also contain binary data, we can ship Avro messages with Kafka. The real question is: where to store the schema?
+\nline
+The \href{https://docs.confluent.io/current/schema-registry/index.html}{Schema Registry} is the answer to this problem: it is a server that runs in your infrastructure (close to your Kafka brokers) and that stores your schemas (including all their versions). When you send Avro messages to Kafka, the messages contain an identifier of a schema stored in the Schema Registry.
+\nline
+A library allows you to serialize and deserialize Avro messages, and to interact transparently with the Schema Registry:
+\begin{itemize}
+	\item When sending a message, the serializer will make sure the schema is registered, get its ID, or register a new version of the schema for you.
+	\item When reading a message, the deserializer will find the ID of the schema in the message, and fetch the schema from the Schema Registry to deserialize the Avro data.
+\end{itemize}
+Both the Schema Registry and the library are under the Confluent umbrella: open source but not part of the Apache project. This means you will want to use the Confluent distribution to use the Schema Registry, not the Apache distribution.
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/schema-registry-at-work}\hspace*{\fill}
+ \caption{\textbf{Schema registry at work}. The producer, after having registered a schema, encodes messages containing a concatenation of the SchemaID and the content (key and value). Then, the consumer extracts the SchemaID, lookups the schema on the registry and decodes the message's content.}
+\end{figure} 
+\subsubsection{Schema Evolution}
+As said, Avro supports schema evolutivity. In particular we define two types of schema compatibility:
+\begin{itemize}
+	\item \textbf{Backward compatibility}:
+	\begin{itemize}
+		\item Code with a new version of the schema can read data written in the old schema
+		\item Code that reads data written with the schema will assume default values if fields are not provided
+	\end{itemize}
+	\item \textbf{Forward compatibility}:
+	\begin{itemize}
+		\item Code with previous versions of the schema can read data written in the new schema
+		\item Code that reads data written with the schema ignores new fields
+	\end{itemize}
+\end{itemize}
+Thus, we have a \textbf{full compatibility} (forward and backward).
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/avro-compatibility-ex}\hspace*{\fill}
+ \caption{Compatibility examples}
+\end{figure} 
+\subsection{Connect for Data Movement}
 \clearpage
 
 
@@ -2076,8 +2224,11 @@ With the \textit{every} operator multiple (partial) instances of the same patter
 \bibitem{event-driven-arch}
 \newblock \href{https://aws.amazon.com/it/event-driven-architecture/}{Event-Driven Architecture}
 
+\bibitem{kafka-basics}
+\newblock \href{Kafka Basics}{https://kafka.apache.org/intro}
 
-
+\bibitem{avro}
+\newblock \href{Avro and Schema Registry}{https://aseigneurin.github.io/2018/08/02/kafka-tutorial-4-avro-and-schema-registry.html}
 
 \end{thebibliography}
 
