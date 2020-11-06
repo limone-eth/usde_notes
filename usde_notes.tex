@@ -719,6 +719,7 @@ Cypher support stored procedures. It allows you to add JAVA functions or simply 
 	\item \textbf{Return only the data you need.} Avoid returning whole nodes and relationships
 	\item Use \textbf{PROFILE / EXPLAIN} to analyze the performance of your queries.
 \end{itemize}
+\pagebreak
 \section{Key-Value DB}
 The main motivation behind Key-Value databases is performance. Indeed, there are certain organizations/companies that cannot accept low performances:
 \begin{itemize}
@@ -1311,7 +1312,7 @@ In Cassandra we start defining queries and then we design the data model. Indeed
  		\item Reads 15ms avg
  	\end{itemize}
  \end{itemize}
- 
+ \pagebreak
  \section{Document-oriented DB}
  \subsection{Why document-based?}
  What makes document databases different from relational databases?
@@ -1328,17 +1329,16 @@ In Cassandra we start defining queries and then we design the data model. Indeed
  	\item \textbf{Distributed}: Resilient and Globally Scalable \\ 
  	Unlike monolithic, scale-up relational databases, document databases are distributed systems at their core. Documents are independent units which makes it easier to distribute them across multiple servers while preserving data locality. Replication with self-healing recovery keeps your applications highly available while giving you the ability to isolate different workloads from one another in a single cluster. Native sharding provides elastic and application-transparent horizontal scale-out to accommodate your workload’s growth, along with geographic data distribution for data sovereignty.
  \end{enumerate}
- \pagebreak
  
  \begin{figure}[ht!]
  \hfill \includegraphics[width=250pt]{images/document-based.png}\hspace*{\fill}
   \caption{Example of document (invoice) stored in a document-based database.}
 \end{figure}  
 
- In Figure 71, we see an example document that could be store in a document-based database. Clearly, the document is made of nested data object which (hypothetically) corresponds to different database tables. We decide to use document-based databases if we usually want to retrieve the data in an aggregate way, avoiding complex joins between table. Indeed, we query the database and we obtain a document with all its subdocuments included. \nline
+The document in Figure 71 is made of nested data object which (hypothetically) corresponds to different database tables. We decide to use document-based databases if we usually want to retrieve the data in an aggregate way, avoiding complex joins between table. Indeed, we query the database and we obtain a document with all its subdocuments included. \nline
  
 \begin{figure}[ht!]
- \hfill \includegraphics[width=250pt]{images/relational-to-document.png}\hspace*{\fill}
+ \hfill \includegraphics[width=300pt]{images/relational-to-document.png}\hspace*{\fill}
   \caption{Example of JSON document}
 \end{figure}  
  
@@ -1353,11 +1353,10 @@ In Cassandra we start defining queries and then we design the data model. Indeed
 \end{itemize} 
  
 \begin{figure}[ht!]
- \hfill \includegraphics[width=220pt]{images/mongodb-features.png}\hspace*{\fill}
+ \hfill \includegraphics[width=300pt]{images/mongodb-features.png}\hspace*{\fill}
   \caption{MongoDB features.}
   \end{figure}
   
-    \pagebreak
 \begin{figure}[ht!]
  \hfill \includegraphics[width=250pt]{images/mongodb-vs-sql.png}\hspace*{\fill}
   \caption{MongoDB terminology vs SQL.}
@@ -1406,7 +1405,6 @@ In Cassandra we start defining queries and then we design the data model. Indeed
   \caption{Reference documents or linking documents.}
 \end{minipage}
 \end{figure} 
-\pagebreak
 \subsubsection{Queries}
 
 \begin{figure}[ht!]
@@ -1429,7 +1427,7 @@ In Cassandra we start defining queries and then we design the data model. Indeed
  MongoDB is a single-master system—each replica set can have only one primary node that receives all the write operations. All other nodes in the same replica set are secondary nodes that replicate the primary node's operation log and apply it to their own data set. By default, clients also read from the primary node, but they can also specify a read preference that allows them to read from secondary nodes.
  \nline
  When the primary node becomes unavailable, the secondary node with the most recent operation log will be elected as the new primary node. Once all the other secondary nodes catch up with the new master, the cluster becomes available again. As clients can't make any write requests during this interval, the data remains consistent across the entire network.
- 
+ \pagebreak
 \section{Streaming Data Engineering}
  
  \begin{figure}[ht!]
@@ -1447,7 +1445,6 @@ In Cassandra we start defining queries and then we design the data model. Indeed
 
 Big data architecture is the foundation for big data analytics. It is the overarching system used to manage large amounts of data so that it can be analyzed for business purposes, steer data analytics, and provide an environment in which big data analytics tools can extract vital business information from otherwise ambiguous data. The big data architecture framework serves as a reference blueprint for big data infrastructures and solutions, \textbf{logically defining how big data solutions will work, the components that will be used, how information will flow, and security details.}
 
-\pagebreak
 
 \subsection{The Solution Space}
 \subsubsection{The Dimensions: Throughput vs. Latency vs. Message size}
@@ -1467,7 +1464,7 @@ We have three options to optimize throughput:
  \hfill \includegraphics[width=180pt]{images/increase-throughput.png}\hspace*{\fill}
 \end{figure}  
 \begin{figure}[ht!]
- \hfill \includegraphics[width=200pt]{images/latency-throughput.png}\hspace*{\fill}
+ \hfill \includegraphics[width=170pt]{images/latency-throughput.png}\hspace*{\fill}
  \caption{Latency-Throughput trade-off}
 \end{figure}  
 
@@ -1478,11 +1475,11 @@ We have three options to optimize throughput:
 \centering
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=.9\linewidth]{images/three-cases-continuum}
+  \includegraphics[width=.8\linewidth]{images/three-cases-continuum}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=.9\linewidth]{images/three-cases}
+  \includegraphics[width=.8\linewidth]{images/three-cases}
 \end{minipage}
 \caption{Three cases and their latency-throughput trade-off.}
 \end{figure} 
@@ -1507,19 +1504,16 @@ Transfer Appliance is a secure, rackable high capacity storage server that you s
 Example: Real Time Inventory \\
 A company has 10k shops distributed all over the planet and an e-commerce site divided in 5/7 areas, with a total of 100k distinct products. To optimize the shipping time they further transform each shop in a shipping point for their products, thus we now have 10k micro market area for the e-commerce (one per each shop). They receive around 10k purchase/s and each message has a size of 100KB. The required throughput for the system is 200MB/s, which is easy to achieve with a Kafka cluster with 10 nodes.
 \begin{figure}[ht!]
- \hfill \includegraphics[width=220pt]{images/continuous.png}\hspace*{\fill}
+ \hfill \includegraphics[width=270pt]{images/continuous.png}\hspace*{\fill}
 \end{figure}  
-
-\pagebreak
 
 \paragraph{Batch Case} \textcolor{red}{balanced throughput-latency trade-off} \nline
 
 Example: customer 360° journey \\
 Here a customer accessing to an e-commerce is sending request to three different subsystems which are handling the different section of the size. Each modification performed on one of the subsystems is captured and stored in a blob storage service and then asynchronously propagated to a data warehouse for analytics purposes. The latency of the process can vary from minutes to days.
 \begin{figure}[ht!]
- \hfill \includegraphics[width=300pt]{images/batch-case.png}\hspace*{\fill}
+ \hfill \includegraphics[width=350pt]{images/batch-case.png}\hspace*{\fill}
 \end{figure}  
-
 \subsection{The Batch Case}
 In a distributed system dealing with Big Data (where complex failure patterns can happen) we usually apply \textbf{Write Once, Read Many principles}
 \begin{itemize}
@@ -1548,8 +1542,6 @@ Big Data projects oriented to Data Warehouse enhancement call
 wrangled
 	\item \textbf{batch} the new parts of an existing file ingested \& wrangled in the next iterations
 \end{itemize}
-
-\pagebreak
 
  \begin{figure}[ht!]
 \centering
@@ -1583,16 +1575,14 @@ In the case of \textit{Next batch} we have two alternatives in ingesting and wra
  \caption{Append vs. Compaction mode}
 \end{figure}  
 
-\pagebreak
-
 \subsection{The Continuous Case}
 \begin{figure}[ht!]
- \hfill \includegraphics[width=250pt]{images/continuous-paradigm.png}\hspace*{\fill}
+ \hfill \includegraphics[width=200pt]{images/continuous-paradigm.png}\hspace*{\fill}
  \caption{The continuous case is based on this paradigm shift.}
 \end{figure}  
 
 \begin{figure}[ht!]
- \hfill \includegraphics[width=250pt]{images/continuous-path.png}\hspace*{\fill}
+ \hfill \includegraphics[width=200pt]{images/continuous-path.png}\hspace*{\fill}
  \caption{Many path to the same destination...}
 \end{figure}  
 
@@ -1634,13 +1624,13 @@ Data streams are (\textit{unbounded}) sequences of time-varying data elements. T
 \end{itemize}
 
 \begin{figure}[ht!]
- \hfill \includegraphics[width=150pt]{images/data-flow.png}\hspace*{\fill}
+ \hfill \includegraphics[width=200pt]{images/data-flow.png}\hspace*{\fill}
  \caption{Unbounded window of data: up to a certain point is finite but it grows infinitely}
 \end{figure} 
 The nature of streams requires a paradigmatic change \textbf{from persistent data} (one time semantics) \textbf{to transient data} (continuous data flow, with static queries).
 
 \begin{figure}[ht!]
- \hfill \includegraphics[width=200pt]{images/continuous-semantics.png}\hspace*{\fill}
+ \hfill \includegraphics[width=230pt]{images/continuous-semantics.png}\hspace*{\fill}
  \caption{Continuous queries registered over strems that are observed through windows.}
 \end{figure} 
 
@@ -1649,18 +1639,17 @@ Ability of an Information Flow Processing (IFP) system to associate some kind of
 \begin{itemize}
 	\item \textbf{Causal} - this happened before than that
 	\begin{figure}[ht!]
- \hfill \includegraphics[width=220pt]{images/causal-time.png}\hspace*{\fill}
+ \hfill \includegraphics[width=250pt]{images/causal-time.png}\hspace*{\fill}
  \caption{We don't know the distance between e1 and e2, we only know that e2 is after e1. The order can be exploited to perform queries like \textit{Does Alice meet Bob before Carl?}}
 \end{figure} 
 	\item \textbf{Absolute} - distance before events
 		\begin{figure}[ht!]
- \hfill \includegraphics[width=220pt]{images/absolute-time.png}\hspace*{\fill}
+ \hfill \includegraphics[width=250pt]{images/absolute-time.png}\hspace*{\fill}
  \caption{We can ask the queries presented in the causal model. WE can start to compose queries taking into account the time \textit{How many people has Alice met in the last 5m} (window of 5mins opened in the past) or \textit{Does Diana meet Bob and then Carl withing 5m?} (window opened in the future).}
  \end{figure} 
- \pagebreak
 	\item \textbf{Interval} - event that last for a given amount of time
 	\begin{figure}[ht!]
- \hfill \includegraphics[width=220pt]{images/absolute-time.png}\hspace*{\fill}
+ \hfill \includegraphics[width=250pt]{images/absolute-time.png}\hspace*{\fill}
  \caption{We can ask the queries presented in the previous cases. It is possible to write even more complex queries like \textit{Which are the meetings that last less than 5m?} or \textit{Which are the meetings with conflicts?}}
  \end{figure} 
 \end{itemize}
@@ -1674,7 +1663,7 @@ Components collaborate by exchanging information about occurrent events. In part
 	\item they \textit{subscribe} to the events that they are interested to be notified about.
 \end{itemize}
 And the essence here is to capture these events and then process them to cause changes to the application in addition to storing them as an audit log.
-\nline
+\\ \pagebreak
 Communication is:
 \begin{itemize}
 	\item Purely message based
@@ -1684,11 +1673,9 @@ Communication is:
 	\item Anonymous
 \end{itemize}
 \begin{figure}[ht!]
- \hfill \includegraphics[width=150pt]{images/event-based.png}\hspace*{\fill}
+ \hfill \includegraphics[width=250pt]{images/event-based.png}\hspace*{\fill}
  \caption{Event-based system. Some components are publishing events and some others are listening for specific events. In this example, the up left component is listening for events that include "fire" happening in any place (* placeholder).}
 \end{figure}  
-
-\pagebreak
 
 \paragraph{Complex Event Processing (CEP)} 
 Also known as event, stream or event stream processing is the use of technology for querying data before storing it within a database or, in some cases, without it ever being stored. Complex event processing is an organizational tool that helps to aggregate a lot of different information and that identifies and analyzes cause-and-effect relationships among events in real time. CEP matches continuously incoming events against a pattern and provides insight into what is happening and allows you to proactively take effective actions.
@@ -1707,7 +1694,7 @@ CEP processes incoming events based on an existing pattern, in a real-time fashi
 \end{figure} 
 
 \begin{figure}[ht!]
- \hfill \includegraphics[width=150pt]{images/cep-detecting-languages.png}\hspace*{\fill}
+ \hfill \includegraphics[width=180pt]{images/cep-detecting-languages.png}\hspace*{\fill}
  \caption{Example of CEP detecting languages by \textit{Cugola, G. and Margara, A., 2010, July. TESLA: a formally defined event specification language.}}
 \end{figure} 
 
@@ -1735,7 +1722,7 @@ A monolithic architecture is comfortable for small teams to work with, which is 
 \end{itemize}
 
 \paragraph{\uline{Service Oriented Architecture}} 
-A service-oriented architecture (SOA) is a software architecture style that refers to an application composed of discrete and loosely coupled software agents that perform a required function. SOA has two main roles: a service provider and a service consumer. Both of these roles can be played by a software agent. The concept of SOA lies in the following: an application can be designed and built in a way that its modules are integrated seamlessly and can be easily reused.
+A service-oriented architecture (SOA) is a software architecture style that refers to an application composed of discrete and loosely coupled software agents that perform a required function. SOA has two main roles: a service provider and a service consumer. Both of these roles can be played by a software agent. The concept of SOA lies in the following: an application can be designed and built in a way that its modules are integrated seamlessly and can be easily reused.\\
 \textbf{Pros:}
 \begin{itemize}
 		\item \textbf{Reusability of services}
@@ -1801,7 +1788,6 @@ You no longer need to write custom code to poll, filter, and route events; the e
 	\item \textbf{Cut costs}
 Event-driven architectures are push-based, so everything happens on-demand as the event presents itself in the router. This way, you’re not paying for continuous polling to check for an event. This means less network bandwidth consumption, less CPU utilization, less idle fleet capacity, and less SSL/TLS handshakes.
 \end{itemize}
-\pagebreak
 \textbf{Cons:}
 \begin{itemize}
 	\item \textbf{Over-engineering of processes} 
@@ -1810,11 +1796,13 @@ Sometimes a simple call from one service to another is enough. If a process uses
 Because processes now rely on eventual consistency, it is not typical to support ACID (atomicity, consistency, isolation, durability) transactions, so handling of duplications, or out of sequence events can make service code more complicated, and harder to test and debug all situations.
 \end{itemize}
 
+\pagebreak
 \begin{figure}[ht!]
  \hfill \includegraphics[width=400pt]{images/event-driven-arch.png}\hspace*{\fill}
  \caption{How it works an event-driven architecture}
 \end{figure} 
 
+\pagebreak
 \section{EPL}
 \subsection{EPL and Esper}
 The \textbf{E}vent \textbf{P}rocessing \textbf{L}anguage (EPL) is a declarative language for dealing with high frequency time-based event data. It is grounded on DSMS approach:
@@ -1872,7 +1860,6 @@ Condition:
  \hfill \includegraphics[width=150pt]{images/epl-processing-model-ex.png}\hspace*{\fill}
  \caption{EPL processing model - Fire example}
 \end{figure} 
-\pagebreak
 
 \subsection{Event types and Query syntax}
 Two ways to declare events:
@@ -1910,7 +1897,7 @@ Event streams and views instead of tables:
 \end{minipage}
 
 \begin{figure}[ht!]
- \hfill \includegraphics[width=250pt]{images/epl-windows.png}\hspace*{\fill}
+ \hfill \includegraphics[width=300pt]{images/epl-windows.png}\hspace*{\fill}
  \caption{EPL offers 4 types of windows that can be used to perform more customized queries.}
 \end{figure} 
 
@@ -1936,11 +1923,11 @@ Event streams and views instead of tables:
 \begin{figure}[ht!]
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=.8\linewidth]{images/output-syntax}
+  \includegraphics[width=.9\linewidth]{images/output-syntax}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=.8\linewidth]{images/output-example}
+  \includegraphics[width=.9\linewidth]{images/output-example}
 \end{minipage}
 \caption{Output can be used to control the advancement of sliding windows.}
 \end{figure}
@@ -1998,7 +1985,6 @@ Examples:
 	\item \uline{\textit{every $A \rightarrow$ every $B$}} - The pattern fires for every A event followed by every B event. \\
 	\textcolor{blue}{\textbf{Matches:} $\{A1,B1\}, \{A1,B2\}, \{A1,B3\}, \{A1,B4\}, \{A2,B3\}, \{A2,B4\}, \{A3,B3\}, \{A3,B4\}, \{A4,B4\} $}
 \end{itemize}
-\pagebreak
 With the \textit{every} operator multiple (partial) instances of the same pattern can be active at the same time. Each instance can consume some resources when events enter the engine. For this reason is good practice to end pending instance whenever possible with:
 \begin{itemize}
 	\item the \textit{timer:within} construct
@@ -2033,7 +2019,7 @@ In Kafka, an \textbf{event} records the fact that "something happened" in the wo
 Events are organized and durably stored in \textbf{topics}. A Topic is a category/feed name to which records are stored and published. An example topic name could be "payments".  Events in a topic can be read as often as needed—unlike traditional messaging systems, events are not deleted after consumption. Instead, you define for how long Kafka should retain your events through a per-topic configuration setting, after which old events will be discarded. Kafka's performance is effectively constant with respect to data size, so storing data for a long time is perfectly fine.
 \nline
 
-\textbf{Topics are partitioned}, meaning a topic is spread over a number of "buckets" located on different Kafka brokers. This distributed placement of your data is very important for scalability because it allows client applications to both read and write the data from/to many brokers at the same time. Indeed, partitions allow topics to be parallelized by splitting the data into a particular topic across multiple brokers. When a new event is published to a topic, it is actually appended to one of the topic's partitions. Events with the same event key (e.g., a customer or vehicle ID) are written to the same partition, and Kafka guarantees that any consumer of a given topic-partition will always read that partition's events in exactly the same order as they were written. \\
+\textbf{Topics are partitioned}, meaning a topic is spread over a number of "buckets" located on different Kafka brokers. This distributed placement of your data is very important for scalability because it allows client applications to both read and write the data from/to many brokers at the same time. Indeed, partitions allow topics to be parallelized by splitting the data into a particular topic across multiple brokers. When a new event is published to a topic, it is actually appended to one of the topic's partitions. Events with the same event key (e.g., a customer or vehicle ID) are written to the same partition, and Kafka guarantees that any consumer of a given topic-partition will always read that partition's events in exactly the same order as they were written. \\ \pagebreak
 There are two policies that can be used when assigning partitions:
 \begin{itemize}
 	\item \textbf{Sticky-Assignment ON}: when adding a new consumer to the group, nothing happens unless the system understand that is useful to assign one of the partitions to that consumer (e.g., if we have 4 partitions and 3 consumers, when adding a 4th consumer, the system assigns a partition to it, so that there are exactly one partition per consumer)
@@ -2111,7 +2097,7 @@ Producers can control durability by requiring the leader a number of acknowledgm
 \end{itemize}
 
 \begin{figure}[ht!]
- \hfill \includegraphics[width=100pt]{images/kafka-replication}\hspace*{\fill}
+ \hfill \includegraphics[width=70pt]{images/kafka-replication}\hspace*{\fill}
  \caption{Fault tolerance via a Replicated Log}
 \end{figure} 
 
@@ -2160,6 +2146,57 @@ Thus, we have a \textbf{full compatibility} (forward and backward).
  \caption{Compatibility examples}
 \end{figure} 
 \subsection{Connect for Data Movement}
+\subsubsection{Kafka Connect}
+\href{https://docs.confluent.io/current/connect/index.html}{Kafka Connect}, an open source component of Apache Kafka®, is a framework for connecting Kafka with external systems such as databases, key-value stores, search indexes, and file systems.
+\nline
+Kafka Connect is focused on streaming data to and from Kafka, making it simpler for you to write high quality, reliable, and high performance connector plugins. It also enables the framework to make guarantees that are difficult to achieve using other frameworks. Kafka Connect is an integral component of an ETL pipeline, when combined with Kafka and a stream processing framework.
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=330pt]{images/kafka-connect}\hspace*{\fill}
+ \caption{Kafka Connect: simpe, scalable and reliable.}
+\end{figure} \\
+The main actors in Kafka Connect are:
+\begin{itemize}
+	\item \textbf{Source Connector}: basically a Kafka Producer client that reads data from an external data system into Kafka. It ingest entire databases and streams table updates to Kafka topics. It can also collect metrics from all of your application servers and store these in Kafka topics, making the data available for stream processing with low latency.
+	\item \textbf{Sink Connectors}: a Kafka Consumer client that writes data to an external data system. It delivers data from Kafka topics into secondary indexes such as Elasticsearch, or batch systems such as Hadoop for offline analysis.
+\end{itemize}
+In order to efficiently discuss the inner workings of Kafka Connect, it is helpful to establish a few \href{https://docs.confluent.io/current/connect/concepts.html}{major concepts}.
+\begin{itemize}
+	\item \textbf{Connectors} – the high level abstraction that coordinates data streaming by managing tasks
+	\item \textbf{Tasks} – the implementation of how data is copied to or from Kafka
+	\item \textbf{Workers} – the running processes that execute connectors and tasks
+	\item \textbf{Converters} – the code used to translate data between Connect and the system sending or receiving data
+	\item \textbf{Transforms} – simple logic to alter each message produced by or sent to a connector
+	\item \textbf{Dead Letter Queue} – how Connect handles connector errors
+\end{itemize}
+\uline{\textbf{Connectors}:} \\
+Connectors in Kafka Connect define where data should be copied to and from. A connector instance is a logical job that is responsible for managing the copying of data between Kafka and another system. All of the classes that implement or are used by a connector are defined in a connector plugin.
+\nline
+There are many \href{http://www.confluent.io/product/connectors/}{existing connectors} that fits several popular technologies. However, it is possible to write a new connector plugin from scratch.
+\nline
+\uline{\textbf{Tasks}:} \\
+Tasks are the main actor in the data model for Connect. Each connector instance coordinates a set of tasks that actually copy the data. By allowing the connector to break a single job into many tasks, Kafka Connect provides built-in support for parallelism and scalable data copying with very little configuration. These tasks have no state stored within them. As such, tasks may be started, stopped, or restarted at any time in order to provide a resilient, scalable data pipeline.
+\nline
+When a connector is first submitted to the cluster, the workers rebalance the full set of connectors in the cluster and their tasks so that each worker has approximately the same amount of work. This same rebalancing procedure is also used when connectors increase or decrease the number of tasks they require, or when a connector’s configuration is changed. When a worker fails, tasks are rebalanced across the active workers. When a task fails, no rebalance is triggered as a task failure is considered an exceptional case. As such, failed tasks are not automatically restarted by the framework and should be restarted via the REST API.
+\nline
+\uline{\textbf{Workers}:} \\
+Connectors and tasks are logical units of work and must be scheduled to execute in a process. Kafka Connect calls these processes workers and has two types of workers: standalone and distributed.
+\begin{itemize}
+	\item \textbf{Standalone Workers:} the simplest mode, where a single process is responsible for executing all connectors and tasks. Since it is a single process, it requires minimal configuration. Standalone mode is convenient for getting started, during development, and in certain situations where only one process makes sense, such as collecting logs from a host. However, because there is only a single process, it also has more limited functionality: scalability is limited to the single process and there is no fault tolerance beyond any monitoring you add to the single process.
+	\item \textbf{Distributed Workers:} this mode provides scalability and automatic fault tolerance for Kafka Connect. In distributed mode, you start many worker processes using the same $group.id$ and they automatically coordinate to schedule execution of connectors and tasks across all available workers. If you add a worker, shut down a worker, or a worker fails unexpectedly, the rest of the workers detect this and automatically coordinate to redistribute connectors and tasks across the updated set of available workers. Note the similarity to consumer group rebalance. Under the covers, connect workers are using consumer groups to coordinate and rebalance.
+\end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/kafka-tasks-workers}\hspace*{\fill}
+ \caption{Parallelism and scalability is achieved splitting the workload into pieces run by a worker as different task, each in a separated thread.}
+\end{figure} 
+\uline{\textbf{Converters}:} \\
+Converters are necessary to have a Kafka Connect deployment support a particular data format when writing to or reading from Kafka. Tasks use converters to change the format of data from bytes to a Connect internal data format and vice versa. 
+\nline
+Converters are decoupled from connectors themselves to allow for reuse of converters between connectors naturally. For example, using the same Avro converter, the JDBC Source Connector can write Avro data to Kafka and the HDFS Sink Connector can read Avro data from Kafka. This means the same converter can be used even though, for example, the JDBC source returns a ResultSet that is eventually written to HDFS as a parquet file.
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=350pt]{images/avro-converter}\hspace*{\fill}
+ \caption{How converters are used when reading from a database using a Source Connector (e.g., MongoDB), writing to Kafka, and finally, writing on a Sink Connector (e.g., MySQL).}
+\end{figure} 
+\subsection{Kafka Stream Processing}
 \clearpage
 
 
