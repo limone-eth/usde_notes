@@ -2193,10 +2193,49 @@ Converters are necessary to have a Kafka Connect deployment support a particular
 \nline
 Converters are decoupled from connectors themselves to allow for reuse of converters between connectors naturally. For example, using the same Avro converter, the JDBC Source Connector can write Avro data to Kafka and the HDFS Sink Connector can read Avro data from Kafka. This means the same converter can be used even though, for example, the JDBC source returns a ResultSet that is eventually written to HDFS as a parquet file.
 \begin{figure}[ht!]
- \hfill \includegraphics[width=350pt]{images/avro-converter}\hspace*{\fill}
+ \hfill \includegraphics[width=400pt]{images/avro-converter}\hspace*{\fill}
  \caption{How converters are used when reading from a database using a Source Connector (e.g., MongoDB), writing to Kafka, and finally, writing on a Sink Connector (e.g., MySQL).}
 \end{figure} 
 \subsection{Kafka Stream Processing}
+Kafka Streams is a library for building streaming applications, specifically applications that transform input Kafka topics into output Kafka topics (or calls to external services, or updates to databases, or whatever). It lets you do this with concise code in a way that is distributed and fault-tolerant. Stream processing is a computer programming paradigm, equivalent to data-flow programming, event stream processing, and reactive programming, that allows some applications to more easily exploit a limited form of parallel processing.
+\subsubsection{Stream vs Table}
+In Kafka, events are captured by an event streaming platform into event streams. \textbf{An event stream records the history of what has happened in the world as a sequence of events.} An example stream is a sales ledger or the sequence of moves in a chess match. With Kafka, such a stream may record the history of your business for hundreds of years. This history is an ordered sequence or chain of events, so we know which event happened before another event to infer causality (e.g., “White moved the e2 pawn to e4, then Black moved the e7 pawn to e5”). A stream thus represents both the past and the present: as we go from today to tomorrow-or from one millisecond to the next-new events are constantly being appended to the history.
+\nline
+Compared to an event stream, \textbf{a table represents the state of the world at a particular point in time}, typically “now.” An example table is total sales or the current state of the board in a chess match. A table is a view of an event stream, and this view is continuously being updated whenever a new event is captured.
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/kafka-streams}\hspace*{\fill}
+ \caption{Kafka Stream vs Table}
+\end{figure}  \\
+\pagebreak
+Streams and tables in Kafka differ in a few ways, notably with regard to whether their contents can be changed, i.e., whether they are \textit{mutable}. (as for table we refer to what is called a KTable in Kafka Streams)
+
+\begin{itemize}
+	\item A \textbf{stream} provides immutable data. It supports only inserting (appending) new events, whereas existing events cannot be changed. Streams are persistent, durable, and fault tolerant. Events in a stream can be keyed, and you can have many events for one key, like “all of Bob’s payments.” If you squint a bit, you could consider a stream to be like a table in a relational database (RDBMS) that has no unique key constraint and that is append only.
+	\item A \textbf{table} provides mutable data. New events-rows can be inserted, and existing rows can be updated and deleted. Here, an event’s key aka row key identifies which row is being mutated. Like streams, tables are persistent, durable, and fault tolerant. Today, a table behaves much like an RDBMS materialized view because it is being changed automatically as soon as any of its input streams or tables change, rather than letting you directly run insert, update, or delete operations against it.
+\end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=350pt]{images/kafka-streams-vs-table}\hspace*{\fill}
+ \caption{Behavior of streams and tables}
+\end{figure} 
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/kafka-stream-table2}\hspace*{\fill}
+ \caption{A \textbf{KStream} is an abstraction of a record stream. Each record in it represents a self-contained piece of data in the unbounded data set.
+A \textbf{KTable} is an abstraction of a changelog stream. Each record in it represents an update (it keeps only the most recent value for each key).}
+\end{figure} 
+\pagebreak
+\subsubsection{Stream-Table duality}
+Notwithstanding their differences, we can observe that there is a close relationship between a stream and a table. We call this the stream-table duality. What this means is:
+\begin{itemize}
+	\item We can turn a stream into a table by aggregating the stream with operations such as $COUNT()$ or $SUM()$, for example. In our chess analogy, we could reconstruct the board’s latest state (table) by replaying all recorded moves (stream).
+	\item We can turn a table into a stream by capturing the changes made to the table—inserts, updates, and deletes—into a “change stream.” This process is often called change data capture or CDC for short. In the chess analogy, we could achieve this by observing the last played move and recording it (into the stream) or, alternatively, by comparing the board’s state (table) before and after the last move and then recording the difference of what changed (into the stream), though this is likely slower than the first option.
+\end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/kafka-stream-table-duality2}\hspace*{\fill} \\ 
+ \center
+ \hfill \includegraphics[width=300pt]{images/kafka-stream-table-duality}\hspace*{\fill}
+ \caption{Kafka Stream-Table Duality}
+\end{figure}
+\raggedright
 \clearpage
 
 
@@ -2262,11 +2301,16 @@ Converters are decoupled from connectors themselves to allow for reuse of conver
 \newblock \href{https://aws.amazon.com/it/event-driven-architecture/}{Event-Driven Architecture}
 
 \bibitem{kafka-basics}
-\newblock \href{Kafka Basics}{https://kafka.apache.org/intro}
+\newblock \href{https://kafka.apache.org/intro}{Kafka Basics}
 
 \bibitem{avro}
-\newblock \href{Avro and Schema Registry}{https://aseigneurin.github.io/2018/08/02/kafka-tutorial-4-avro-and-schema-registry.html}
+\newblock \href{https://aseigneurin.github.io/2018/08/02/kafka-tutorial-4-avro-and-schema-registry.html}{Avro and Schema Registry}
 
+\bibitem{kafka-streams}
+\newblock \href{https://www.confluent.io/blog/kafka-streams-tables-part-1-event-streaming/}{Kafka Stream and Tables}
+
+\bibitem{kafka-streams-table}
+\newblock \href{https://docs.confluent.io/current/streams/concepts.html}{Kafka Streams Concepts}
 \end{thebibliography}
 
 \end{document}
