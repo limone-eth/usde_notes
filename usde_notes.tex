@@ -20,6 +20,7 @@
 \usepackage{listings}
 \usepackage{bm}
 \usepackage{lmodern,textcomp}
+\usepackage{listings}
 %\usepackage[english]{babel}
 
 
@@ -2101,6 +2102,20 @@ Producers can control durability by requiring the leader a number of acknowledgm
  \caption{Fault tolerance via a Replicated Log}
 \end{figure} 
 
+\subsubsection{Zookeeper}
+Zookeeper is a top-level software developed by Apache that acts as a centralized service and is used to maintain naming and configuration data and to provide flexible and robust synchronization within distributed systems. Zookeeper keeps track of status of the Kafka cluster nodes and it also keeps track of Kafka topics, partitions etc.
+\nline
+\textbf{How does it work:} \\
+The data within Zookeeper is divided across multiple collection of nodes and this is how it achieves its high availability and consistency. In case a node fails, Zookeeper can perform instant failover migration; e.g. if a master node fails, a new one is selected in real-time by polling within an ensemble. A client connecting to the server can query a different node if the first one fails to respond.
+\nline
+\textbf{Why is Zookeeper necessary for Apache Kafka?}
+\begin{itemize}
+	\item \textbf{Controller election:} the controller is one of the most important broking entity in a Kafka ecosystem, and it also has the responsibility to maintain the leader-follower relationship across all the partitions. If a node by some reason is shutting down, it’s the controller’s responsibility to tell all the replicas to act as partition leaders in order to fulfill the duties of the partition leaders on the node that is about to fail. So, whenever a node shuts down, a new controller can be elected and it can also be made sure that at any given time, there is only one controller and all the follower nodes have agreed on that.
+	\item \textbf{Configuration of Topics:} the configuration regarding all the topics including the list of existing topics, the number of partitions for each topic, the location of all the replicas, list of configuration overrides for all topics and which node is the preferred leader, etc.
+	\item \textbf{Access control lists:} access control lists or ACLs for all the topics are also maintained within Zookeeper.
+	\item \textbf{Membership of the cluster:} Zookeeper also maintains a list of all the brokers that are functioning at any given moment and are a part of the cluster.
+\end{itemize}
+
 \subsection{Avro and Schema Registry}
 \href{https://avro.apache.org/}{Apache Avro} is a binary serialization format. It relies on schemas (defined in JSON format) that define what fields are present and their type. Nested fields are supported as well as arrays. \\
 In Avro, data is defined with a self-describing schema allowing for:
@@ -2206,7 +2221,6 @@ Compared to an event stream, \textbf{a table represents the state of the world a
  \hfill \includegraphics[width=300pt]{images/kafka-streams}\hspace*{\fill}
  \caption{Kafka Stream vs Table}
 \end{figure}  \\
-\pagebreak
 Streams and tables in Kafka differ in a few ways, notably with regard to whether their contents can be changed, i.e., whether they are \textit{mutable}. (as for table we refer to what is called a KTable in Kafka Streams)
 
 \begin{itemize}
@@ -2222,7 +2236,6 @@ Streams and tables in Kafka differ in a few ways, notably with regard to whether
  \caption{A \textbf{KStream} is an abstraction of a record stream. Each record in it represents a self-contained piece of data in the unbounded data set.
 A \textbf{KTable} is an abstraction of a changelog stream. Each record in it represents an update (it keeps only the most recent value for each key).}
 \end{figure} 
-\pagebreak
 \subsubsection{Stream-Table duality}
 Notwithstanding their differences, we can observe that there is a close relationship between a stream and a table. We call this the stream-table duality. What this means is:
 \begin{itemize}
@@ -2230,12 +2243,293 @@ Notwithstanding their differences, we can observe that there is a close relation
 	\item We can turn a table into a stream by capturing the changes made to the table—inserts, updates, and deletes—into a “change stream.” This process is often called change data capture or CDC for short. In the chess analogy, we could achieve this by observing the last played move and recording it (into the stream) or, alternatively, by comparing the board’s state (table) before and after the last move and then recording the difference of what changed (into the stream), though this is likely slower than the first option.
 \end{itemize}
 \begin{figure}[ht!]
- \hfill \includegraphics[width=300pt]{images/kafka-stream-table-duality2}\hspace*{\fill} \\ 
- \center
+ \hfill \includegraphics[width=350pt]{images/kafka-stream-table-duality2}\hspace*{\fill}
+ \end{figure}
+ \pagebreak
+ \begin{figure}[ht!]
  \hfill \includegraphics[width=300pt]{images/kafka-stream-table-duality}\hspace*{\fill}
  \caption{Kafka Stream-Table Duality}
 \end{figure}
-\raggedright
+\pagebreak
+
+\section{KSQL}
+\subsection{Introducing KSQL: Streaming SQL for Apache Kafka}
+KSQL is a streaming SQL engine for Apache Kafka®. KSQL lowers the entry bar to the world of stream processing, providing a simple and completely interactive SQL interface for processing data in Kafka. KSQL is distributed, scalable, reliable, and real time. It supports a wide range of powerful stream processing operations including aggregations, joins, windowing, sessionization, and much more.
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/ksql-example}\hspace*{\fill}
+ \caption{A simple example.}
+ \end{figure} \\
+\textbf{What does it even mean to query streaming data, and how does this compare to a SQL database?} \\
+Well, it’s actually quite different to a SQL database. Most databases are used for doing on-demand lookups and modifications to stored data. KSQL doesn’t do lookups (yet), what it does do is continuous transformations— that is, stream processing. For example, imagine that I have a stream of clicks from users and a table of account information about those users being continuously updated. KSQL allows me to model this stream of clicks, and table of users, and join the two together. Even though one of those two things is infinite.
+\nline
+So what KSQL runs are \textbf{continuous queries} — transformations that run continuously as new data passes through them — on streams of data in Kafka topics. In contrast, queries over a relational database are \textit{one-time queries} — run once to completion over a data set—as in a SELECT statement on finite rows in a database.
+ 
+ \subsubsection{What is KSQL good for?}
+ \begin{enumerate}
+ 	\item \textbf{Real-time monitoring meets real-time analytics}
+ 	\begin{verbatim}
+CREATE TABLE error_counts AS
+SELECT error_code, count(*) FROM monitoring_stream
+WINDOW TUMBLING (SIZE 1 MINUTE)
+WHERE type = 'ERROR'
+\end{verbatim}
+One use of this is defining custom business-level metrics that are computed in real-time and that you can monitor and alert off of, just like you do your CPU load. KSQL allows defining custom metrics off of streams of raw events that applications generate, whether they are logging events, database updates, or any other kind. \\
+For example, a web app might need to check that every time a new customer signs up a welcome email is sent, a new user record is created, and their credit card is billed. These functions might be spread over different services or applications and you would want to monitor that each thing happened for each new customer within some SLA, like 30 secs.
+\item  \textbf{Security and anomaly detection}
+\begin{verbatim}
+CREATE TABLE possible_fraud AS
+SELECT card_number, count(*)
+FROM authorization_attempts
+WINDOW TUMBLING (SIZE 5 SECONDS)
+GROUP BY card_number
+HAVING count(*) > 3;
+\end{verbatim}
+KSQL queries can transform event streams into numerical time series aggregates that are pumped into Elastic using the Kafka-Elastic connector and visualized in a Grafana UI. \\
+Rather than monitoring application behavior or business behavior you’re looking for patterns of fraud, abuse, spam, intrusion, or other bad behavior. KSQL gives a simple, sophisticated, and real-time way of defining these patterns and querying real-time streams.
+\item \textbf{Online data integration}
+\begin{verbatim}
+CREATE STREAM vip_users AS
+SELECT userid, page, action 
+FROM clickstream c 
+LEFT JOIN users u ON c.userid = u.user_id
+WHERE u.level = 'Platinum';
+\end{verbatim}
+Much of the data processing done in companies falls in the domain of data enrichment: take data coming out of several databases, transform it, join it together, and store it into a key-value store, search index, cache, or other data serving system. For a long time, ETL — Extract, Transform, and Load — for data integration was performed as periodic batch jobs. For example, dump the raw data in real time, and then transform it every few hours to enable efficient queries. For many use cases, this delay is unacceptable. KSQL, when used with Kafka connectors, enables a move from batch data integration to online data integration. You can enrich streams of data with metadata stored in tables using stream-table joins, or do simple filtering of PII (personally identifiable information) data before loading the stream into another system.
+\item \textbf{Application development} \\
+Many applications transform an input stream into an output stream. For example, a process responsible for reordering products that are running low in inventory for an online store might feed off a stream of sales and shipments to compute a stream of orders to place. \\
+For more complex applications written in Java, Kafka’s native streams API may be just the thing. But for simple apps, or teams not interested in Java programming a simple SQL interface may be what they’re looking for.
+ \end{enumerate}
+ 
+ \subsubsection{Core Abstractions in KSQL}
+ KSQL uses Kafka’s Streams API internally and they share the same core abstractions for stream processing on Kafka. There are two core abstractions in KSQL that map to the two core abstractions in Kafka Streams and allow you to manipulate Kafka topics:
+ \begin{itemize}
+ 	\item \textbf{Stream:} a stream is an unbounded sequence of structured data (“facts”).  For example, we could have a stream of financial transactions such as “Alice sent \$100 to Bob, then Charlie sent \$50 to Bob”. Facts in a stream are immutable, which means new facts can be inserted to a stream, but existing facts can never be updated or deleted. Streams can be created from a Kafka topic or derived from existing streams and tables.
+ 	\begin{verbatim}
+CREATE STREAM pageviews (viewtime BIGINT, userid VARCHAR, pageid VARCHAR) 
+WITH (kafka_topic='pageviews', value_format=’JSON’);
+ 	\end{verbatim}
+ 	\item \textbf{Table:} a table is a view of a STREAM or another TABLE and represents a collection of evolving facts.  For example, we could have a table that contains the latest financial information such as “Bob’s current account balance is \$150”.  It is the equivalent of a traditional database table but enriched by streaming semantics such as windowing.  Facts in a table are mutable, which means new facts can be inserted to the table, and existing facts can be updated or deleted.  Tables can be created from a Kafka topic or derived from existing streams and tables.
+ 	\begin{verbatim}
+CREATE TABLE users (registertime BIGINT, gender VARCHAR, regionid VARCHAR, userid  VARCHAR) 
+WITH (kafka_topic='users', value_format='DELIMITED');
+ 	\end{verbatim}
+ \end{itemize}
+ \pagebreak
+ \subsubsection{KSQL Internals}
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/ksql-cluster}\hspace*{\fill}
+ \caption{A look inside KSQL server}
+ \end{figure} 
+ There is a KSQL server process which executes queries. A set of KSQL processes run as a cluster. You can dynamically add more processing capacity by starting more instances of the KSQL server. These instances are fault-tolerant: if one fails, the others will take over its work. Queries are launched using the interactive KSQL command line client which sends commands to the cluster over a REST API. The command line allows you to inspect the available streams and tables, issue new queries, check the status of and terminate running queries. Internally KSQL is built using Kafka’s Streams API; it inherits its elastic scalability, advanced state management, and fault tolerance, and support for Kafka’s recently introduced exactly-once processing semantics. The KSQL server embeds this and adds on top a distributed SQL engine (including some fancy stuff like automatic byte code generation for query performance) and a REST API for queries and control.
+ 
+\subsubsection{Kafka + KSQL turn the database inside out} 
+ In a relational database, the table is the core abstraction and the log is an implementation detail. In an event-centric world with the database is turned inside out, the core abstraction is not the table; it is the log. The tables are merely derived from the log and updated continuously as new data arrives in the log. The central log is Kafka and KSQL is the engine that allows you to create the desired materialized views and represent them as continuously updated tables. You can then run point-in-time queries against such streaming tables to get the latest value for every key in the log, in an ongoing fashion.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/ksql-query-ex}\hspace*{\fill}
+ \end{figure} \\
+The Kafka log is the core storage abstraction for streaming data, allowing same data that went into your offline data warehouse is to now be available for stream processing. Everything else is a streaming materialized view over the log, be it various databases, search indexes, or other data serving systems in the company. All data enrichment and ETL needed to create these derived views can now be done in a streaming fashion using KSQL. Monitoring, security, anomaly and threat detection, analytics, and response to failures can be done in real-time versus when it is too late. All this is available for just about anyone to use through a simple and familiar SQL interface to all your Kafka data: KSQL.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/kafka-ksql}\hspace*{\fill}
+ \end{figure} 
+
+\subsection{A DEMO of
+Kafka + KSQL + InfluxDB 2.0}
+This demo is an adaptation and extension to InfluxDB of the popular
+\href{https://github.com/confluentinc/demo-scene/blob/master/ksql-workshop/ksql-workshop.adoc}{Workshop: Real-time SQL Stream Processing at Scale with
+Apache Kafka and KSQL (Mac/Linux)}.
+\nline
+\textbf{Step list}:
+\begin{enumerate}
+    \item producing a topic
+    \item registering a stream
+    \item querying a stream
+    \begin{enumerate}
+         \item in real-time
+         \item in the past
+    \end{enumerate}     
+    \item creating a stream from a query
+    \item integrating a database via Kafka Connect
+    \item registering a tables
+    \item enriching a data stream joining it with a table
+    \item streaming aggregates
+    \item visual analytics in InfluxDB 2.0
+\end{enumerate}
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=220pt]{images/ksql-demo-scene}\hspace*{\fill}
+ \caption{Demo scene (after having completed all the steps)}
+ \end{figure} 
+ \pagebreak
+  \textcolor{red}{Before starting, make sure to have a KSQL server running on your machine. Check the link to the original demo provided at the beginning of this section, and follow the steps up to 3.} \nline
+ KSQL can be used via the command-line interface (CLI), a graphical UI built into Confluent Control Center, or the documented \href{https://docs.ksqldb.io/en/latest/developer-guide/api/index.html}{REST API}.
+ In this workshop, we will use the CLI, which if you have used Oracle’s sql*plus, MySQL CLI, and so on will feel very familiar to you.
+ \begin{enumerate}
+ 	\item \textbf{Producing a topic} \\
+ 	KSQL can be used to view the topic metadata on a Kafka cluster (SHOW TOPICS;), as well as inspect the messages in a topic (PRINT $<topic>$;). \\ The event stream driving this example is a simulated stream of events purporting to show the ratings left by users on a website, with data elements including the device type that they used, the star rating, and a message associated with the rating. Using the PRINT command we can easily see column names and values within a topic’s messages. Kafka messages consist of a timestamp, key, and message (payload), which are all shown in the PRINT output.
+  \begin{figure}[ht!]
+  \hfill \includegraphics[width=100pt]{images/ksql-demo-1}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd1}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd2}\hspace*{\fill} 
+ \end{figure} 
+ 
+  \item \textbf{From topics to streams} \\
+  Having inspected the topics and contents of them, let’s get into some SQL now. The first step in KSQL is to register the source topic with KSQL. \\ 
+  By registering a topic with KSQL, we declare its schema and properties. The inbound event stream of ratings data is a STREAM. We just need a simple CREATE STREAM with the appropriate values in the WITH clause. We can notice that in the above CREATE STREAM statement we didn’t specify any of the column names. That’s because the data is in Avro format, and the Confluent Schema Registry supplies the actual schema details. We can use DESCRIBE to examine an object’s columns.
+  \begin{figure}[ht!]
+  \hfill \includegraphics[width=120pt]{images/ksql-demo-2}\hspace*{\fill}
+  \end{figure}
+  \pagebreak
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd3}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd4}\hspace*{\fill} 
+ \end{figure}  
+
+ \item \textbf{Querying streams}
+ Let’s run our first SQL. As anyone familar with SQL knows, SELECT * will return all columns from a given object. We’ll notice that the data keeps on coming. That is because KSQL is fundamentally a streaming engine, and the queries that you run are continuous queries. Having previously set the offset to earliest KSQL is showing us the past (data from the beginning of the topic), the present (data now arriving in the topic), and the future (all new data that arrives in the topic from now on).
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=150pt]{images/ksql-demo-3}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd5}\hspace*{\fill} 
+ \end{figure} \\
+ Since KSQL is heavily based on SQL, you can do many of the standard SQL things we’d expect to be able to do, including predicates and selection of specific columns.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd6}\hspace*{\fill} 
+ \end{figure} \\
+ Since Apache Kafka persists data, it is possible to use KSQL to query and process data from the past, as well as new events that arrive on the topic. To tell KSQL to always process from beginning of topic run \textit{SET 'auto.offset.reset' = 'earliest';}. \textcolor{blue}{Run this now, so that future processing includes all existing data.}
+ \pagebreak
+ \item \textbf{Creating a stream from a query} \\
+ Let’s take the poor ratings from people with iOS devices, and create a new stream from them!
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=190pt]{images/ksql-demo-4}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd7}\hspace*{\fill} 
+ \end{figure} \\
+ What this does is set a KSQL continuous query running that processes messages on the source ratings topic to:
+ \begin{itemize}
+ 	\item applies the predicates (STARS $<$ 3 AND CHANNEL='iOS')
+ 	\item select just the specified columns (with * we are selecting all the columns)
+ \end{itemize}
+ Each processed message is written to a new Kafka topic. Remember, this is a continuous query, so every single source message—past, present, and future—will be processed with low-latency in this way. If we only want to process new messages and not existing ones, we would configure \textit{SET 'auto.offset.reset' = 'latest';}. \\
+ Using DESCRIBE we can see that the new stream has the same columns as the source one.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd8}\hspace*{\fill} 
+ \end{figure} \\
+ The query that we created above (CREATE STREAM POOR\_RATINGS AS…) populates a Kafka topic, which we can also access as a KSQL stream (as in the previous step). Let’s inspect this topic now, using KSQL.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd9}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd10}\hspace*{\fill} 
+ \end{figure}  
+ \pagebreak
+ \item \textbf{Integrating a database via Kafka Connect} \\
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=130pt]{images/ksql-demo-5}\hspace*{\fill} 
+ \end{figure} 
+ If you want to try a "complete" solution for integrating your database with Kafka, then \href{https://www.confluent.io/blog/no-more-silos-how-to-integrate-your-databases-with-apache-kafka-and-cdc/}{log-based Change-Data-Capture (CDC)} is the route to go. Done properly, CDC basically enables you to stream every single event from a database into Kafka. Broadly put, relational databases use a transaction log (also called a binlog or redo log depending on DB flavour), to which every event in the database is written. Update a row, insert a row, delete a row – it all goes to the database’s transaction log. CDC tools generally work by utilising this transaction log to extract at very low latency and low impact the events that are occurring on the database (or a schema/table within it). 
+ \nline
+ Many CDC tools exist, serving a broad range of sources. Some specialise in broad coverage of source systems, others in just specific ones. The common factor uniting most of them is close integration with Apache Kafka and Confluent Platform. Being able to stream your data from a database not only into Kafka, but with support for things such as the preservation of schemas through the Schema Registry, is a defining factor of these CDC tools. Some are built using the Kafka Connect framework itself (and tend to offer a richer degree of integration), whilst others use the Kafka Producer API in conjunction with support for the Schema Registry, etc. \nline
+ CDC tools with support from the vendor and integration with Confluent Platform are (as of March 2018):
+ \begin{itemize}
+ 	\item \href{https://www.attunity.com/products/replicate/}{Attunity Replicate}
+\item \href{https://debezium.io/}{Debezium}
+\item \href{https://www.ibm.com/support/knowledgecenter/en/SSTRGZ_11.4.0/com.ibm.cdcdoc.cdckafka.doc/concepts/abouttargetingkafka.html}{IBM IIDR}
+\item \href{https://www.oracle.com/middleware/data-integration/goldengate/big-data/index.html}{Oracle GoldenGate for Big Data}
+\item \href{https://www.sqdata.com/real-time-streaming-hadoop-kafka/}{SQ Data}
+ \end{itemize}
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/kafka-cdc}\hspace*{\fill} 
+	\caption{Log-based Change-Data-Capture integration.} 
+ \end{figure} 
+ \pagebreak
+ Figure 134 shows how CDC works. In particular the data showed in the Kafka Commit Log (the table on the right) is the result of this flow of queries on the MySQL database:
+ \begin{enumerate}
+ 	\item insert $K1=A$, $K2=B$, $K3=C$
+ 	\item update $K2=D$
+ 	\item delete $K3$
+ \end{enumerate}
+ After having started MySQL and Debezium, we enter the MySQL command prompt and make some changes to the data.
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd12}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd11}\hspace*{\fill} 
+ \vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd13}\hspace*{\fill} 
+ \end{figure}  \\
+We should see each DML cause an almost-instantaneous update on the Kafka topic. For each change, inspect the output of the Kafka topic. Observe the difference between an INSERT and UPDATE. \nline
+Let’s look at the customer data from the KSQL prompt. Here we use the FROM BEGINNING argument, which tells KSQL to go back to the beginning of the topic and show all data from there.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd14}\hspace*{\fill} 
+ \end{figure} 
+ \item \textbf{From topics to tables} \\
+ Since we’re going to eventually join the customer data to the ratings, the customer Kafka messages must be keyed on the field on which we are performing the join. If this is not the case the join will fail and we’ll get NULL values in the result. Our source customer messages are currently keyed using the Primary Key of the source table, but using a key serialisation that KSQL does not yet support—and thus in effect is not useful as a key in KSQL at all.
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-key1}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-key2}\hspace*{\fill} 
+ \end{figure} \\
+ To re-key a topic in Kafka we can use KSQL! First we will register the customer topic.
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd15}\hspace*{\fill} 
+ \end{figure} \\
+ \pagebreak
+ With the stream registered, we can now re-key the topic, using a KSQL CSAS (\textit{Create Stream ... As}) and the PARTITION BY clause. Note that we’re also changing the number of partitions from that of the source (4) to match that of the ratings topic (1).
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd16}\hspace*{\fill} 
+ \end{figure} \\
+We can see that now the key is an integer (PRINT CUSTOMERS\_SRC\_REKEY FROM BEGINNING;).
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd17}\hspace*{\fill} 
+ \end{figure} \\
+ Finally, let’s register a table over the new re-keyed topic. This because for each key (user id), we want to know its current value (name, status, etc).
+ \begin{figure}[ht!]
+  \hfill \includegraphics[width=150pt]{images/ksql-demo-6}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd18}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd19}\hspace*{\fill} 
+ \end{figure} 
+ \item \textbf{Enriching each rating with customer data} \\
+ Let’s use the customer data (CUSTOMERS) and use it to enrich the inbound stream of ratings data (RATINGS) to show against each rating who the customer is, and their club status ('platinum','gold', etc).
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=150pt]{images/ksql-demo-7}\hspace*{\fill}
+\end{figure}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd20}\hspace*{\fill} 
+ \end{figure} 
+ \pagebreak
+ \item \textbf{Filtering an enriched stream} \\
+ Having enriched the initial stream of ratings events with customer data, we can now persist a filtered version of that stream that includes a predicate to identify just those VIP customers who have left bad reviews.
+  \begin{figure}[ht!]
+  \hfill \includegraphics[width=200pt]{images/ksql-demo-8}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd21}\hspace*{\fill}
+ \vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd22}\hspace*{\fill} 
+ \end{figure} 
+ \item \textbf{Streaming aggregates} \\
+ KSQL can create aggregations of event data, either over all events to date (and continuing to update with new data), or based on a time window. The time window types supported are:
+ \begin{itemize}
+ 	\item Tumbling (e.g. every 5 minutes : 00:00, 00:05, 00:10)
+ 	\item Hopping (e.g. every 5 minutes, advancing 1 minute: 00:00-00:05, 00:01-00:06)
+ 	\item Session (Sets a timeout for the given key, after which any new data is treated as a new session)
+ \end{itemize}
+ To understand more about these time windows, you can read the related \href{https://docs.confluent.io/current/streams/developer-guide/dsl-api.html#windowing}{Kafka Streams documentation}. Since KSQL is built on Kafka Streams, the concepts are the same. The \href{https://docs.ksqldb.io/en/latest/tutorials/examples/}{KSQL-specific documentation} is also useful. 
+ \pagebreak
+ Aggregates can be persisted too. Instead of CREATE STREAM as we did above, we’re going to instead persist with a CREATE TABLE, since aggregates are always a table (key + value). Just as before though, a Kafka topic is continually populated with the results of the query.
+   \begin{figure}[ht!]
+  \hfill \includegraphics[width=200pt]{images/ksql-demo-9}\hspace*{\fill}
+\vspace{0.1em} \center 
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd23}\hspace*{\fill}
+\end{figure} \\
+This table that we’ve created is just a first class object in KSQL, updated in real time with the results from the aggregate query. Because it’s just another object in KSQL, we can query and filter it as any other.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=400pt]{images/ksql-cmd24}\hspace*{\fill}
+ \end{figure} \\
+ If you let the SELECT output continue to run, you’ll see all of the past time window aggregate values—but also the current one. Note that the \textit{current} time window’s aggregate value will continue to update, because new events are being continually processed and reflected in the value. If you were to send an event to the source ratings topic with a timestamp in the past, the corresponding time window’s aggregate would be re-emitted.
+ \end{enumerate}
+
 \clearpage
 
 
@@ -2270,10 +2564,10 @@ Notwithstanding their differences, we can observe that there is a close relation
 \bibitem{columnar-redshit}
 \newblock \href{https://docs.aws.amazon.com/redshift/latest/dg/c_columnar_storage_disk_mem_mgmnt.html}{Columnar storage documentation on Amazon}
 
-\bibitem{gossip-protocol}
+\bibitem{cassandra-gossip-protocol}
 \newblock \href{https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/architecture/archGossipAbout.html}{Cassandra gossip protocol}
 
-\bibitem{gossip-protocol}
+\bibitem{cassandra-data}
 \newblock \href{https://www.guru99.com/cassandra-architecture.html#:~:text=There\%20are\%20two\%20kinds\%20of\%20replication\%20strategies\%20in\%20Cassandra.&text=SimpleStrategy\%20is\%20used\%20when\%20you,direction\%20in\%20the\%20Node\%20ring.}{Cassandra data replication}
 
 \bibitem{document-db}
@@ -2303,6 +2597,9 @@ Notwithstanding their differences, we can observe that there is a close relation
 \bibitem{kafka-basics}
 \newblock \href{https://kafka.apache.org/intro}{Kafka Basics}
 
+\bibitem{kafka-zookeeper}
+\newblock \href{https://www.cloudkarafka.com/blog/2018-07-04-cloudkarafka_what_is_zookeeper.html}{Kafka and Zookeeper}
+
 \bibitem{avro}
 \newblock \href{https://aseigneurin.github.io/2018/08/02/kafka-tutorial-4-avro-and-schema-registry.html}{Avro and Schema Registry}
 
@@ -2311,6 +2608,10 @@ Notwithstanding their differences, we can observe that there is a close relation
 
 \bibitem{kafka-streams-table}
 \newblock \href{https://docs.confluent.io/current/streams/concepts.html}{Kafka Streams Concepts}
+
+\bibitem{ksql}
+\newblock \href{https://www.confluent.io/blog/ksql-streaming-sql-for-apache-kafka/}{KSQL}
+
 \end{thebibliography}
 
 \end{document}
