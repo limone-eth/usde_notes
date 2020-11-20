@@ -2529,7 +2529,154 @@ This table that we’ve created is just a first class object in KSQL, updated in
  \end{figure} \\
  If you let the SELECT output continue to run, you’ll see all of the past time window aggregate values—but also the current one. Note that the \textit{current} time window’s aggregate value will continue to update, because new events are being continually processed and reflected in the value. If you were to send an event to the source ratings topic with a timestamp in the past, the corresponding time window’s aggregate would be re-emitted.
  \end{enumerate}
+ 
+ \pagebreak
+ 
+ \section{Spark}
+ \subsection{Introduction}
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-intro}\hspace*{\fill}
+ \end{figure} 
+ Apache Spark is a unified analytics engine for big data processing, with built-in modules for streaming, SQL, machine learning and graph processing.
+ \nline
+Actually, today we have many free solutions for big data processing. Many companies also offer specialized enterprise features to complement the open-source platforms.
+\nline
+The trend started in 1999 with the development of Apache Lucene. The framework soon became open-source and led to the creation of Hadoop. Two of the most popular big data processing frameworks in use today are open source – \textbf{Apache Hadoop} and \textbf{Apache Spark}. 
+Contents
+Introduction - Big Data Processing
+Today, we have many free solutions for big data processing. Many companies also offer specialized enterprise features to complement the open-source platforms.
 
+The trend started in 1999 with the development of Apache Lucene. The framework soon became open-source and led to the creation of Hadoop. Two of the most popular big data processing frameworks in use today are open source – Apache Hadoop and Apache Spark.
+\nline
+There is always a question about which framework to use, Hadoop, or Spark.
+\paragraph{\uline{Hadoop}}
+Apache Hadoop is a platform that handles large datasets in a distributed fashion. The framework uses MapReduce to split the data into blocks and assign the chunks to nodes across a cluster. MapReduce then processes the data in parallel on each node to produce a unique output. 
+\nline
+Every machine in a cluster both stores and processes data. \textbf{Hadoop stores the data to disks using HDFS (disk-centrik)}. The software offers seamless scalability options. You can start with as low as one machine and then expand to thousands, adding any type of enterprise or commodity hardware.
+\nline
+The Hadoop ecosystem is highly fault-tolerant. Hadoop does not depend on hardware to achieve high availability. At its core, Hadoop is built to look for failures at the application layer. By replicating data across a cluster, when a piece of hardware fails, the framework can build the missing parts from another location.
+\nline
+\uline{HDFS: Hadoop Distributed File System.} \\
+This is the file system that manages the storage of large sets of data across a Hadoop cluster. HDFS can handle both structured and unstructured data. The storage hardware can range from any consumer-grade HDDs to enterprise drives.
+
+\paragraph{\uline{Spark}}
+Apache Spark is an open-source tool. This framework can run in a standalone mode or on a cloud or cluster manager such as Apache Mesos, and other platforms. \textbf{It is designed for fast performance and uses RAM for caching and processing data}.
+\nline
+Spark performs different types of big data workloads. This includes MapReduce-like batch processing, as well as real-time stream processing, machine learning, graph computation, and interactive queries. With easy to use high-level APIs, Spark can integrate with many different libraries, including PyTorch and TensorFlow.
+\nline
+The Spark engine was created to improve the efficiency of MapReduce and keep its benefits. Even though Spark does not have its file system, it can access data on many different storage solutions. The data structure that Spark uses is called Resilient Distributed Dataset, or RDD.
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-vs-hadoop}\hspace*{\fill}
+ \caption{Spark (RAM-centric) vs Hadoop (disk-centric)}
+ \end{figure} 
+ \subsubsection{Spark APIs}
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-arch}
+ \hspace*{\fill}
+ \caption{The architecture of Spark}
+ \end{figure} 
+ Apache Spark has a well-defined layered architecture where all the spark components and layers are loosely coupled. This architecture is further integrated with various extensions and libraries. Apache Spark Architecture is based on two main abstractions:
+ \begin{itemize}
+ 	\item \textbf{Resilient Distributed Dataset (RDD)}
+ 	\item \textbf{Directed Acyclic Graph (DAG)}
+ \end{itemize}
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-api-history}
+ \hspace*{\fill}
+ \caption{History of Spark APIs}
+ \end{figure} 
+ \paragraph{\uline{RDD}}
+ RDDs are the building blocks of any Spark application. RDD stands for:
+ \begin{itemize}
+ 	\item \textbf{Resilient}: Fault tolerant and is capable of rebuilding data on failure
+\item \textbf{Distributed:} Distributed data among the multiple nodes in a cluster
+\item \textbf{Dataset:} Collection of partitioned data with values
+ \end{itemize}
+At the core, an RDD is an immutable distributed collection of elements of your data, partitioned across nodes in your cluster that can be operated in parallel with a low-level API that offers transformations and actions. \nline
+There are two basic operations that can be done on RDDs. They are \textbf{transformations} and \textbf{actions}.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-rdd-op}
+ \hspace*{\fill}
+ \caption{Spark RDD operations}
+ \end{figure} 
+ \paragraph{Transformations:} These are functions that accept the existing RDDs as input and outputs one or more RDDs. However, the data in the existing RDD in Spark does not change as it is immutable. Some of the transformation operations are provided in the table below:
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-rdd-transformation}
+ \hspace*{\fill}
+ \end{figure} \\
+ These transformations are executed when they are invoked or called. Every time transformations are applied, a new RDD is created.
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-rdd-transformation-ex}
+ \hspace*{\fill}
+ \caption{\textbf{Transformations - logical view.} Since RDD are immutable, transformations create new RDD.}
+ \end{figure} 
+      \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-rdd-transformation-physical}
+ \hspace*{\fill}
+ \caption{\textbf{Transformations - physical view.}}
+ \end{figure} 
+ \paragraph{Actions:}
+ Actions in Spark are functions that return the end result of RDD computations. It uses a lineage graph to load data onto the RDD in a particular order. After all of the transformations are done, actions return the final result to the Spark Driver. Actions are operations that provide non-RDD values. Some of the common actions used in Spark are given below:
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-rdd-actions}
+ \hspace*{\fill}
+ \end{figure}  \\
+ Whenever an action is called, the driver delegates tasks to workers, who then in turn return the answer to the driver whenever their execution is completed.
+       \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-rdd-transformation-physical}
+ \hspace*{\fill}
+ \caption{\textbf{Actions - system view.}}
+ \end{figure}  \\
+ Fundamental to Apache Spark are the notions that:
+ \begin{itemize}
+ 	\item Transformations are \textbf{LAZY}
+ 	\item Actions are \textbf{EAGER}
+ \end{itemize}
+ This means that, we can run multiple transformations back-to-back, and no job is triggered until the first action is requested. \nline
+ Lazyness is a common pattern in functional programming and Big Data languages (Scala core design, Java 8 Streams API, Hive and Pig). As said, it consists in the system collecting tasks and then do the best to optimize the performance of execution. \\
+ Benefits:
+ \begin{itemize}
+ 	\item Not forced to load all data at $1^{st}$ step: technically impossible with large datasets
+ 	\item Easier to parallelize operations: N different transformations can be processed on a single data element, on a single thread, on a single machine
+ 	\item Allows optimizations
+ \end{itemize}
+With RDD we can also cache results and reuse them without recomputing the partial transformations.
+ \nline
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-caching}
+ \hspace*{\fill}
+ \end{figure} 
+ \paragraph{\uline{DataFrame}}
+ Like an RDD, a DataFrame is an immutable distributed collection of data. Unlike an RDD, data is organized into named columns, like a table in a relational database. Designed to make large data sets processing even easier, DataFrame allows developers to impose a structure onto a distributed collection of data, allowing higher-level abstraction; it provides a domain specific language API to manipulate your distributed data; and makes Spark accessible to a wider audience, beyond specialized data engineers.
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-dataframe-snippet}
+ \hspace*{\fill}
+ \caption{Spark DataFrame snippet}
+ \end{figure}  \\
+ Because DataFrame API is declarative, a large number of optimizations are possible: 
+ \begin{itemize}
+ 	\item Optimizing data types for storage
+ 	\item Rewriting queries for performance
+ 	\item Predicate push downs
+ \end{itemize}
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=150pt]{images/spark-dataframe-exec}
+ \hspace*{\fill}
+ \caption{Spark DataFrame execution}
+ \end{figure} 
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-rdd-vs-dataframe}
+ \hspace*{\fill}
+ \caption{Performance - RDD vs. DataFrame}
+ \end{figure} 
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-catalyst}
+ \hspace*{\fill}
+ \caption{\textbf{Under the hood: Catalyst.} Generates optimal RDD code from the user request.}
+ \end{figure} 
+ \paragraph{\uline{Dataset APIs}}
+ \subsubsection{Spark at Work}
+ \subsection{Spark Structured Streaming}
 \clearpage
 
 
@@ -2611,6 +2758,18 @@ This table that we’ve created is just a first class object in KSQL, updated in
 
 \bibitem{ksql}
 \newblock \href{https://www.confluent.io/blog/ksql-streaming-sql-for-apache-kafka/}{KSQL}
+
+\bibitem{spark-vs-hadoop}
+\newblock \href{https://phoenixnap.com/kb/hadoop-vs-spark}{Hadoop vs. Spark}
+
+\bibitem{spark-arch}
+\newblock \href{https://www.edureka.co/blog/spark-architecture/}{Spark Architecture}
+
+\bibitem{spark-apis}
+\newblock \href{https://databricks.com/blog/2016/07/14/a-tale-of-three-apache-spark-apis-rdds-dataframes-and-datasets.html}{Spark APIs}
+
+\bibitem{spark-rdd}
+\newblock \href{https://intellipaat.com/blog/tutorial/spark-tutorial/programming-with-rdds/}{Spark RDDs}
 
 \end{thebibliography}
 
