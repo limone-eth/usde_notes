@@ -2675,8 +2675,225 @@ With RDD we can also cache results and reuse them without recomputing the partia
  \caption{\textbf{Under the hood: Catalyst.} Generates optimal RDD code from the user request.}
  \end{figure} 
  \paragraph{\uline{Dataset APIs}}
+ In Spark 2.0, DataFrame APIs will merge with Datasets APIs, unifying data processing capabilities across libraries. Because of this unification, developers now have fewer concepts to learn or remember, and work with a single high-level and type-safe API called Dataset. 
+ \nline
+ Indeed,sStarting in Spark 2.0, Dataset takes on two distinct APIs characteristics: a \textit{strongly-typed} API and an \textit{untyped} API, as shown in the table below. Conceptually, consider DataFrame as an alias for a collection of generic objects Dataset[Row], where a Row is a generic untyped JVM object. Dataset, by contrast, is a collection of strongly-typed JVM objects, dictated by a case class you define in Scala or a class in Java.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/spark-dataset}
+ \hspace*{\fill}
+ \caption{Since Python and R have no compile-time type-safety, we only have untyped APIs, namely DataFrames.}
+ \end{figure} \\
+ As a Spark developer, you benefit with the DataFrame and Dataset unified APIs in Spark 2.0 in a number of ways. The most relevant benefit is known as \textbf{Static-typing and runtime type-safety}. \nline
+ 	Consider static-typing and runtime safety as a spectrum, with SQL least restrictive to Dataset most restrictive. For instance, in your Spark SQL string queries, you won’t know a syntax error until runtime (which could be costly), whereas in DataFrames and Datasets you can catch errors at compile time (which saves developer-time and costs). That is, if you invoke a function in DataFrame that is not part of the API, the compiler will catch it. However, it won’t detect a non-existing column name until runtime. \nline
+ 	At the far end of the spectrum is Dataset, most restrictive. Since Dataset APIs are all expressed as lambda functions and JVM typed objects, any mismatch of typed-parameters will be detected at compile time. Also, your analysis error can be detected at compile time too, when using Datasets, hence saving developer-time and costs. \nline
+ 	All this translates to is a spectrum of type-safety along syntax and analysis error in your Spark code, with Datasets as most restrictive yet productive for a developer.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-dataset-error-discovery}
+ \hspace*{\fill}
+ \caption{Error Discovery - DataFrame vs Dataset vs SQL}
+ \end{figure}
+ \pagebreak
  \subsubsection{Spark at Work}
+ \textbf{DAG Scheduler} is the scheduling layer of Apache Spark that implements stage-oriented scheduling. It transforms a logical execution plan (i.e. RDD lineage of dependencies built using RDD transformations) to a physical one (a \textbf{Job)}) considering data locality and partitioning (to avoid shuffles). Each Job is a DAG of Stages which are broken down into Tasks.
+ \begin{figure}[ht!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/spark-dag-scheduler}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/spark-stages}
+\end{minipage}
+\caption{DAG Scheduler transforming RDD Lineage into stage DAG.}
+\end{figure}  \\
+ A Spark cluster includes:
+ \begin{itemize}
+ 	\item One \textbf{Driver} running the user application
+	\item Multiple \textbf{Executors} (typically, one instance per node) with multiple \textbf{Slots} (typically, one per core/CPU)
+ \end{itemize}
+  \begin{figure}[ht!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/spark-cluster}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/spark-cluster-runtime}
+\end{minipage}
+\end{figure}
+The \textbf{Driver} assigns \textbf{Tasks} to Executors’ \textbf{Slots} for parallel execution.  The Driver also makes sure that all tasks of a Stage are executed before starting any task of the next stage
  \subsection{Spark Structured Streaming}
+ \subsubsection{Overview}
+ \href{https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html}{Structured Streaming} is a scalable and fault-tolerant stream processing engine built on the Spark SQL engine. You can express your streaming computation the same way you would express a batch computation on static data. The Spark SQL engine will take care of running it incrementally and continuously and updating the final result as streaming data continues to arrive. Developers can use the Dataset/DataFrame API in Scala, Java, Python or R to express streaming aggregations, event-time windows, stream-to-batch joins, etc. The computation is executed on the same optimized Spark SQL engine. Finally, the system ensures end-to-end exactly-once fault-tolerance guarantees through checkpointing and Write-Ahead Logs. In short, Structured Streaming provides fast, scalable, fault-tolerant, end-to-end exactly-once stream processing without the user having to reason about streaming. 
+ \nline
+ Internally, by default, Structured Streaming queries are processed using a \textbf{micro-batch processing engine}, which processes data streams as a series of small batch jobs thereby achieving end-to-end latencies as low as 100 milliseconds and exactly-once fault-tolerance guarantees. However, since Spark 2.3, a new low-latency processing mode called \textbf{Continuous Processing} was introduced, which can achieve end-to-end latencies as low as 1 millisecond with at-least-once guarantees. Without changing the Dataset/DataFrame operations in your queries, developers will be able to choose the mode based on your application requirements.
+ \subsubsection{Programming Model}
+ The key idea in Structured Streaming is to treat a live data stream as a table that is being continuously appended. This leads to a new stream processing model that is very similar to a batch processing model. You will express your streaming computation as standard batch-like query as on a static table, and Spark runs it as an incremental query on the \textit{unbounded input table}. 
+ \paragraph{\uline{Basic Concepts}}
+ Consider the input data stream as the “Input Table”. Every data item that is arriving on the stream is like a new row being appended to the Input Table.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-data-stream}
+ \hspace*{\fill}
+ \end{figure} \\
+ A query on the input will generate the “Result Table”. Every trigger interval (say, every 1 second), new rows get appended to the Input Table, which eventually updates the Result Table. Whenever the result table gets updated, we would want to write the changed result rows to an external sink.
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-basic-concept}
+ \hspace*{\fill}
+ \end{figure} \\
+ The “Output” is defined as what gets written out to the external storage. The output can be defined in a different mode:
+ \begin{itemize}
+ 	\item \textbf{Complete Mode} - The entire updated Result Table will be written to the external storage. It is up to the storage connector to decide how to handle writing of the entire table.
+	\item \textbf{Append Mode} - Only the new rows appended in the Result Table since the last trigger will be written to the external storage. This is applicable only on the queries where existing rows in the Result Table are not expected to change.
+	\item \textbf{Update Mode} - Only the rows that were updated in the Result Table since the last trigger will be written to the external storage. Note that this is different from the Complete Mode in that this mode only outputs the rows that have changed since the last trigger. If the query doesn’t contain aggregations, it will be equivalent to Append mode.
+ \end{itemize}
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/spark-mode-ex}
+ \hspace*{\fill}
+ \caption{Example of Complete Mode.}
+ \end{figure} 
+ \textbf{Note that Structured Streaming does not materialize the entire table.} It reads the latest available data from the streaming data source, processes it incrementally to update the result, and then discards the source data. It only keeps around the minimal intermediate state data as required to update the result (e.g. intermediate counts in the earlier example). \nline
+ This model is significantly different from many other stream processing engines. Many streaming systems require the user to maintain running aggregations themselves, thus having to reason about fault-tolerance, and data consistency (at-least-once, or at-most-once, or exactly-once). In this model, Spark is responsible for updating the Result Table when there is new data, thus relieving the users from reasoning about it. As an example, let’s see how this model handles event-time based processing and late arriving data.
+ \paragraph{\uline{Handling Event-time and Late Data}}
+ Event-time is the time embedded in the data itself. For many applications, you may want to operate on this event-time. For example, if you want to get the number of events generated by IoT devices every minute, then you probably want to use the time when the data was generated (that is, event-time in the data), rather than the time Spark receives them. This event-time is very naturally expressed in this model – each event from the devices is a row in the table, and event-time is a column value in the row. This allows window-based aggregations (e.g. number of events every minute) to be just a special type of grouping and aggregation on the event-time column – each time window is a group and each row can belong to multiple windows/groups. Therefore, such event-time-window-based aggregation queries can be defined consistently on both a static dataset (e.g. from collected device events logs) as well as on a data stream, making the life of the user much easier. 
+ \nline
+ Furthermore, this model naturally handles data that has arrived later than expected based on its event-time. Since Spark is updating the Result Table, it has full control over updating old aggregates when there is late data, as well as cleaning up old aggregates to limit the size of intermediate state data. Since Spark 2.1, we have support for watermarking which allows the user to specify the threshold of late data, and allows the engine to accordingly clean up old state.
+ \subsubsection{API using Datasets and DataFrames}
+ Since Spark 2.0, DataFrames and Datasets can represent static, bounded data, as well as streaming, unbounded data. Similar to static Datasets/DataFrames, you can use the common entry point SparkSession (Scala/Java/Python/R docs) to create streaming DataFrames/Datasets from streaming sources, and apply the same operations on them as static DataFrames/Datasets. 
+ \nline
+ Streaming DataFrames can be created through the \textit{DataStreamReader} interface (Scala/Java/Python docs) returned by \textit{SparkSession.readStream()}. Similar to the read interface for creating static DataFrame, you can specify the details of the source – data format, schema, options, etc.
+ \paragraph{\uline{Input Sources}}
+ There are a few built-in sources:
+ \begin{itemize}
+ 	\item \textbf{File source} - Reads files written in a directory as a stream of data. Files will be processed in the order of file modification time. Supported file formats are text, CSV, JSON, ORC, Parquet. 
+	\item \textbf{Kafka source} - Reads data from Kafka. 
+
+	\item \textbf{Socket source (for testing)} - Reads UTF8 text data from a socket connection. The listening server socket is at the driver. Note that this should be used only for testing as this does not provide end-to-end fault-tolerance guarantees.
+ \end{itemize}
+      \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-streaming-ex}
+ \hspace*{\fill}
+ \center  
+ \hfill \includegraphics[width=200pt]{images/spark-streaming-ex-2}
+ \hspace*{\fill}
+ \caption{e.g., Python}
+ \end{figure}
+ \raggedright
+ \paragraph{\uline{Window Operations on Event Time}}
+ Aggregations over a sliding event-time window are straightforward with Structured Streaming and are very similar to grouped aggregations. In a grouped aggregation, aggregate values (e.g. counts) are maintained for each unique value in the user-specified grouping column. In case of window-based aggregations, aggregate values are maintained for each window the event-time of a row falls into. 
+ \nline
+ Imagine that the example of Figure 149 is modified and the stream now contains lines along with the time when the line was generated. Instead of running word counts, we want to count words within 10 minute windows, updating every 5 minutes. That is, word counts in words received between 10 minute windows 12:00 - 12:10, 12:05 - 12:15, 12:10 - 12:20, etc. Note that 12:00 - 12:10 means data that arrived after 12:00 but before 12:10. Now, consider a word that was received at 12:07. This word should increment the counts corresponding to two windows 12:00 - 12:10 and 12:05 - 12:15. So the counts will be indexed by both, the grouping key (i.e. the word) and the window (can be calculated from the event-time).
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-streaming-window}
+ \hspace*{\fill}
+ \center 
+  \hfill \includegraphics[width=250pt]{images/spark-streaming-window-group}
+ \hspace*{\fill}
+ \caption{Spark Structured Streaming treats this type of windows as grouping clauses.}
+ \end{figure}
+ \pagebreak
+  \paragraph{\uline{Handling Late Data and Watermarking}} 
+  Now consider what happens if one of the events arrives late to the application. For example, say, a word generated at 12:04 (i.e. event time) could be received by the application at 12:11. The application should use the time 12:04 instead of 12:11 to update the older counts for the window 12:00 - 12:10. This occurs naturally in our window-based grouping – Structured Streaming can maintain the intermediate state for partial aggregates for a long period of time such that late data can update aggregates of old windows correctly, as illustrated below.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/spark-streaming-late-data}
+ \hspace*{\fill}
+ \center 
+  \hfill \includegraphics[width=250pt]{images/spark-streaming-late-ex}
+ \hspace*{\fill}
+ \end{figure} \\
+ However, to run this query for days, it’s necessary for the system to bound the amount of intermediate in-memory state it accumulates. This means the system needs to know when an old aggregate can be dropped from the in-memory state because the application is not going to receive late data for that aggregate any more. To enable this, in Spark 2.1, \textbf{watermarking} has been introduced, which lets the engine automatically track the current event time in the data and attempt to clean up old state accordingly. You can define the watermark of a query by specifying the event time column and the threshold on how late the data is expected to be in terms of event time. For a specific window ending at time T, the engine will maintain state and allow late data to update the state until (\textit{max event time seen by the engine - late threshold $>$ T}). In other words, late data within the threshold will be aggregated, but data later than the threshold will start getting dropped (see later in the section for the exact guarantees).
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/spark-streaming-watermark-update}
+ \hspace*{\fill}
+ \end{figure} \\
+ As shown in the illustration, the maximum event time tracked by the engine is the \textcolor{blue}{\textit{blue dashed line}}, and the watermark set as (max event time - '10 mins') at the beginning of every trigger is the \textcolor{red}{\textit{red line}}. For example, when the engine observes the data (12:14, dog), it sets the watermark for the next trigger as 12:04. This watermark lets the engine maintain intermediate state for additional 10 minutes to allow late data to be counted. For example, the data (12:09, cat) is out of order and late, and it falls in windows 12:00 - 12:10 and 12:05 - 12:15. Since, it is still ahead of the watermark 12:04 in the trigger, the engine still maintains the intermediate counts as state and correctly updates the counts of the related windows. However, when the watermark is updated to 12:11, the intermediate state for window (12:00 - 12:10) is cleared, and all subsequent data (e.g. (12:04, donkey)) is considered “too late” and therefore ignored. Note that after every trigger, the updated counts (i.e. purple rows) are written to sink as the trigger output, as dictated by the Update mode.
+\nline
+Some sinks (e.g. files) may not supported fine-grained updates that Update Mode requires. To work with them, we there is also the support for Append Mode, where only the final counts are written to sink. This is illustrated below.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/spark-streaming-watermark-append}
+ \hspace*{\fill}
+ \end{figure} \\
+ Similar to the Update Mode earlier, the engine maintains intermediate counts for each window. However, the partial counts are not updated to the Result Table and not written to sink. The engine waits for “10 mins” for late date to be counted, then drops intermediate state of a $window < watermark$, and appends the final counts to the Result Table/sink. For example, the final counts of window 12:00 - 12:10 is appended to the Result Table only after the watermark is updated to 12:11.
+ \nline
+ \textbf{Semantic Guarantees of Aggregation with Watermarking:}
+ \begin{itemize}
+ 	\item A watermark delay (set with $withWatermark$) of “2 hours” guarantees that the engine will never drop any data that is less than 2 hours delayed. In other words, any data less than 2 hours behind (in terms of event-time) the latest data processed till then is guaranteed to be aggregated.
+ 	\item However, the guarantee is strict only in one direction. Data delayed by more than 2 hours is not guaranteed to be dropped; it may or may not get aggregated. More delayed is the data, less likely is the engine going to process it.
+ \end{itemize}
+ \paragraph{\uline{Join Operations}}
+ Structured Streaming supports joining a streaming Dataset/DataFrame with a static Dataset/DataFrame as well as another streaming Dataset/DataFrame. The result of the streaming join is generated incrementally, similar to the results of streaming aggregations in the previous section. In this section we will explore what type of joins (i.e. inner, outer, etc.) are supported in the above cases. Note that in all the supported join types, the result of the join with a streaming Dataset/DataFrame will be the exactly the same as if it was with a static Dataset/DataFrame containing the same data in the stream.
+ \pagebreak
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/spark-streaming-joins}
+ \hspace*{\fill}
+ \end{figure}  \\
+ Notes:
+ \begin{itemize}
+ 	\item INNER and LEFT-OUTER stream-static joins are not stateful
+ 	\item OUTER and RIGHT-OUTER stream-static joins are not supported
+ \end{itemize}
+ In Spark 2.3, the support for \textbf{stream-stream joins} has been added, that is, you can join two streaming Datasets/DataFrames. The challenge of generating join results between two data streams is that, at any point of time, the view of the dataset is incomplete for both sides of the join making it much harder to find matches between inputs. Any row received from one input stream can match with any future, yet-to-be-received row from the other input stream. Hence, for both the input streams, we buffer past input as streaming state, so that we can match every future input with past input and accordingly generate joined results. Furthermore, similar to streaming aggregations, we automatically handle late, out-of-order data and can limit the state using watermarks. 
+ \nline
+ The solution to this problem are \textbf{windows} (but not the kind you can express as a group by clause):
+ \begin{itemize}
+ 	\item buffer past input as streaming state
+ 	\item handle late, out-of-order data using watermarks
+ \end{itemize}
+ Inner joins on any kind of columns along with any kind of join conditions are supported. However, as the stream runs, the size of streaming state will keep growing indefinitely as all past input must be saved as any new input can match with any input from the past. To avoid unbounded state, you have to define additional join conditions such that indefinitely old inputs cannot match with future inputs and therefore can be cleared from the state. In other words, you will have to do the following additional steps in the join.
+ \begin{itemize}
+ 	\item Define watermark delays on both inputs such that the engine knows how delayed the input can be (similar to streaming aggregations)
+ 	\item Define a constraint on event-time across the two inputs such that the engine can figure out when old rows of one input is not going to be required (i.e. will not satisfy the time constraint) for matches with the other input. This constraint can be defined in one of the two ways.
+ 	\begin{itemize}
+ 		\item Time range join conditions (e.g. ...\textit{JOIN ON leftTime BETWEEN rightTime AND rightTime + INTERVAL 1 HOUR}),
+ 		\item Join on event-time windows (e.g. ...\textit{JOIN ON leftTimeWindow = rightTimeWindow}).
+ 	\end{itemize}
+ \end{itemize}
+Let’s understand this with an example.
+\nline
+Let’s say we want to join a stream of advertisement impressions (when an ad was shown) with another stream of user clicks on advertisements to correlate when impressions led to monetizable clicks. To allow the state cleanup in this stream-stream join, you will have to specify the watermarking delays and the time constraints as follows.
+\begin{itemize}
+	\item \uline{Watermark delays}: Say, the impressions and the corresponding clicks can be late/out-of-order in event-time by at most 2 and 3 hours, respectively.
+	\item \uline{Event-time range condition}: Say, a click can occur within a time range of 0 seconds to 1 hour after the corresponding impression.
+\end{itemize}
+\pagebreak
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/spark-streaming-stream-joins}
+ \hspace*{\fill}
+ \caption{Inner Joins with optional Watermarking - Code example}
+ \end{figure} 
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/spark-stream-stream-joins}
+ \hspace*{\fill}
+ \caption{Support table for joins in streaming queries}
+ \end{figure} 
+ \paragraph{\uline{Starting Streaming Queries}}
+ Once you have defined the final result DataFrame/Dataset, all that is left is for you to start the streaming computation. To do that, you have to use the \textit{DataStreamWriter} (Scala/Java/Python docs) returned through \textit{Dataset.writeStream()}. You will have to specify one or more of the following in this interface.
+ \begin{itemize}
+ 	\item \textbf{Details of the output sink}: Data format, location, etc.
+ 	\item \textbf{Output mode}: Specify what gets written to the output sink.
+ 	\item \textbf{Query name}: Optionally, specify a unique name of the query for identification.
+ 	\item \textbf{Trigger interval}: Optionally, specify the trigger interval. 
+ 	\item \textbf{Checkpoint location}: For some output sinks where the end-to-end fault-tolerance can be guaranteed, specify the location where the system will write all the checkpoint information. This should be a directory in an HDFS-compatible fault-tolerant file system.
+ \end{itemize}
+ \textbf{Output sinks}
+ \begin{itemize}
+ 	\item \textbf{File sink} - a directory
+ 	\item \textbf{Kafka sink} - one or more topics in Kafka
+ 	\item \textbf{Foreach sink} - Runs arbitrary computation
+ 	\item \textbf{Console sink (for debugging)}
+ 	\item \textbf{Memory sink (for debugging)}
+ \end{itemize}
+ \pagebreak
+      \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/spark-streaming-queries1}
+ \hspace*{\fill}
+ \center 
+  \hfill \includegraphics[width=300pt]{images/spark-streaming-queries2}
+ \hspace*{\fill}
+ \caption{Managing Streaming Queries}
+ \end{figure} 
+ \pagebreak
+ 
+ \section{Data Acquisition}
 \clearpage
 
 
