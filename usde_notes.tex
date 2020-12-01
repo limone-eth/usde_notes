@@ -2894,6 +2894,463 @@ Let’s say we want to join a stream of advertisement impressions (when an ad wa
  \pagebreak
  
  \section{Data Acquisition}
+ \subsection{Intro}
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/data-analysis-pipeline}
+ \hspace*{\fill}
+\caption{The Data Analysis Pipeline}
+ \end{figure}
+ \textit{Data acquisition is the processes for bringing data that has been created by a source outside the organization, into the organization, for production use.} \nline
+ Prior to the Big Data revolution, companies were inward-looking in terms of data. During this time, data-centric environments like data warehouses dealt only with data created within the enterprise. But with the advent of data science and predictive analytics, many organizations have come to the realization that enterprise data must be fused with external data to enable and scale a digital business transformation.
+ \nline
+ This means that processes for identifying, sourcing, understanding, assessing and ingesting such data must be developed.
+ \nline
+ This brings us to two points of terminological confusion. First, “data acquisition” is sometimes used to refer to data that the organization produces, rather than (or as well as) data that comes from outside the organization. This is a fallacy, because the data the organization produces is already acquired.
+ \nline
+ Second, the term “ingestion” is often used in place of “data acquisition.” Ingestion is merely the process of copying data from outside an environment to inside an environment and is very much narrower in scope than data acquisition. It seems to be a term that is more commonplace, because there are mature ingestion tools in the marketplace. (These are extremely useful, but ingestion is not data acquisition.)
+ \subsubsection{The 3 Ws of (Social) API \& Scraping}
+ \paragraph{\uline{What}}
+ \textit{"An API is a set of routines protocols and tools for building software applications."} - Wikipedia \nline
+ A \textbf{Web API} (HTTP based API) allows a programmatic access to data and platform. In case there is no API available one could proceed with \textbf{Scraping} (importing data directly from the website HTML).
+ \paragraph{\uline{Why}} Using an API to interact with data has many benefits:
+ \begin{itemize}
+ 	\item Separation between model and presentation - \textcolor{orange}{Tech}
+ 	\item Avoid direct access to the platform website - \textcolor{orange}{Tech}
+ 	\item Request throttling - \textcolor{orange}{Tech}
+ 	\begin{itemize}
+ 		\item Avoid server congestion
+ 		\item Avoid DOS/DDOS
+ 	\end{itemize}
+ 	\item Regulate access to the data - \textcolor{blue}{Business}
+ 	\begin{itemize}
+ 		\item Traceable accounts
+ 		\item Enable access to only a portion of the available data (by Time or by Location)
+ 	\end{itemize}
+ 	\item Provide paid access to full (or higher volume) data - \textcolor{blue}{Business} 
+ \end{itemize}
+ \pagebreak
+ \paragraph{\uline{Who}}
+ Several APIs available on the web.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/data-acquisition-who}
+ \hspace*{\fill}
+\caption{More than 14.000 APIs available (see \href{https://www.programmableweb.com/}{programmableweb.com}}
+ \end{figure}
+ \paragraph{\uline{How - URLs}}
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/data-acquisition-url}
+ \hspace*{\fill} 
+ \end{figure}
+ When the scheme is HTTP(s), we can make HTTP requests as:
+ \textcolor{red}{VERB} \textcolor{blue}{URL} \nline
+ The VERB (or method) can be one of:
+ \begin{itemize}
+ 	\item GET
+ 	\item POST
+ 	\item DELETE
+ 	\item OPTIONS
+ 	\item and more: \href{http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html}{w3.org}
+ \end{itemize}
+ Each API exposes a set of HTTP(s) endpoints (URLs) to call in order to get data or perform action on the platform.
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/data-acquisition-endpoints}
+ \hspace*{\fill} 
+ \end{figure}
+ \pagebreak
+ Most of the endpoints can be "tweaked" via one or more parameters. Parameters can be added to an URL by appending to the endpoint some (URL encoded) strings.
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=110pt]{images/data-acquisition-parameters}
+ \hspace*{\fill}
+ \caption{The request in plain English is: “Twitter, I am 1235abcd, can you please give me the 100 most recent tweets, in italian, by the user @expo2015milano?”} 
+ \end{figure}
+ \subsection{API types and REST}
+\textit{“Representational state transfer (REST) is a style of software architecture.”} - Roy T. Fielding \nline
+Principles:
+\begin{itemize}
+	\item \textbf{Client-Server}: a uniform interface separates clients from servers.
+	\item \textbf{Stateless}: the client-server communication is constrained by no client context being stored on the server.
+	\item \textbf{Cacheable}: clients and intermediaries can cache responses.
+	\item \textbf{Layered system}: clients cannot tell whether are connected directly to the server.
+	\item \textbf{Uniform interface}: simplifies and decouples the architecture.
+\end{itemize}
+\subsubsection{WebAPI vs RESTful API}
+\begin{itemize}
+	\item \textbf{WebAPI}: an API that uses the HTTP protocol, characterized by a non-standard/unpredictable URL format. \\
+	e.g., \textit{POST http://example.com/getUserData.do?user=1234}
+	\item \textbf{RESTful API}: resource based WebAPI with standard/predictable URL format. \\
+	e.g., \textit{GET http://example.com/user/1234}
+\end{itemize}
+The RESTful API uses the available HTTP verbs to perform CRUD (Create, Read, Update, Delete) operations based on the "context":
+\begin{itemize}
+	\item \textbf{Collection}: a set of items/resources (e.g., /users)
+	\item \textbf{Item}: a specific item/resource in a collection (e.g., /users/{id})
+\end{itemize}
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/rest-crud}
+ \hspace*{\fill}
+ \end{figure}
+ Almost all the APIs require a kind of \textbf{user authentication}. The user must register to the developer platform of the provider to obtain the \textbf{keys} to access the API. Most of the main API providers use the \textbf{OAuth protocol} to authenticate a user. \nline
+ The user registers to the developer portal to obtain a key and a secret. Platform authenticates the user via key/secret pair and supply a token that can be used to perform HTTP(S) requests to the desired API endpoint.
+\subsubsection{The five pillars of REST}
+ A set of constraints that inform an architecture:
+ \begin{itemize}
+ 	\item \textbf{Resource Identification}: Name everything that the application deals with, and identify each item with a URI (Unique Resource Identifier).
+ 	\begin{itemize}
+ 		\item \textit{products} in an online shop (\textit{http://example.com/products/34})
+ 		\item \textit{categories} that are used for grouping products (\textit{http://example.com/categories/2})
+ 		\item \textit{customers} that are expected to buy products (\textit{http://example.com/customers/5})
+ 		\item \textit{shopping carts} where customers collect products (\textit{http://example.com/customers/5/carts/1})
+ 	\end{itemize}
+ 	\item \textbf{Uniform Interface}: the same small set of operations (HTTP VERBs) applies to everything. \\ A small set of verbs are applied to a large set of \textit{nouns}:
+ 	\begin{itemize}
+ 		\item verbs are universal and not invented on a per-application base
+ 		\item if many applications need new verbs, the uniform interface can be extended
+ 	\end{itemize}
+ 	Identify operations that are candidates for optimizations
+ 	\begin{itemize}
+ 		\item GET and HEAD are \textit{safe operations} (they do not modify data, they just read it)
+ 		\item PUT and DELETE are \textit{idempotent operations} (invoking the same operations multiple times does not change the returned value)
+ 		\item POST is the catch-all and can have side-effects
+ 	\end{itemize}
+ 	\item \textbf{Self-Describing Messages} \\
+ 	Resources are abstract entities
+ 	\begin{itemize}
+ 		\item Resource Identification guarantees that they are clearly identified they are accessed through a Uniform Interface
+ 	\end{itemize}
+ 	Resources are accessed using resource representations
+ 	\begin{itemize}
+ 	   \item resource representations are sufficient to represent a resource 	     
+ 	   \item it is communicated which kind of representation is used
+ 	   \item representation formats can be negotiated between peers
+ 	\end{itemize}
+ 	Resource representations can be based on different constraints
+ 	\begin{itemize}
+ 		\item XML and JSON can represent the same model for different users 
+ 		\item whatever the representation is, it must support \textcolor{red}{links}
+ 	\end{itemize}
+ 	\item \textbf{Hypermedia Driving Application State}
+ 	Resources representations contain \textit{links} to identified resources
+ 	\begin{itemize}
+ 		\item Resources and state can be used by navigating links
+ 		\item links make interconnected resources navigable
+ 		\item without navigation, identifying new resources is service-specific
+ 	\end{itemize}
+ 	RESTful applications navigate instead of calling
+ 	\begin{itemize}
+ 		\item representations contain information about possible traversals
+ 		\item the application navigates to the next resource depending on link semantics
+ 		\item all links use resource identifiers
+ 	\end{itemize}
+ 	\item \textbf{Stateless Interactions} This constraint does not say Stateless Applications! For many RESTful applications, state is an essential part, the idea of REST is to avoid long-lasting transactions in applications. \uline{Statelessness means to move state to clients or resources}, avoiding to store the state in middle-tier application components. \\ \pagebreak
+ 	\uline{Resource state is managed on the server}
+ 	\begin{itemize}
+ 		\item it is \textcolor{red}{the same for every client} working with the service
+ 		\item when client changes resource state other clients see this change as well
+ 	\end{itemize}
+ 	\uline{Client state is managed on the client}
+ 	\begin{itemize}
+ 		\item it is \textcolor{red}{specific for a client} and thus has to be maintained by each client
+ 		\item it may affect access to server resources, but not the resources themselves
+ 	\end{itemize}
+ 	Security \& performance issues with client state must be cared for
+ 	\begin{itemize}
+ 		\item clients can (try to) cheat by lying about their state (e.g., authentication)
+ 		\item by the way, keeping client state on the server is expensive
+  	\end{itemize}
+ \end{itemize}
+ \subsubsection{The Web and REST}
+ RESTful Web uses HTTP methods as the uniform interface. \\
+ $Web=URI+HTTP+(HTML|XML|JSON)$ \nline
+ To identify resources on the Web we use \textcolor{red}{URI}s, human-readable universal identifiers. Making everything a universally unique identified thing is important
+ \begin{itemize}
+ 	\item it removes the necessity to scope non-universal identifiers (the namespace problem)
+ 	\item it allows to refer to all things in exactly the same way
+ \end{itemize}
+ HTTP is essential for implementing a Uniform Interface. HTTP defines a small set of methods for acting on URI-identified resources. Misusing HTTP turns application into a non-RESTful application. \\
+ Extending HTTP turns applications into more specialized RESTful applications, it may be appropriate when more operations are required but it seriously reduces the number of potentials clients.
+  \nline
+\paragraph{\uline{Resource representation}} Essential for implementing \textit{Self-Describing Message} and support for \textit{Hypermedia Driving Application State}. \\
+ Resource identification denotes an \textit{abstract resource}
+ \begin{itemize}
+ 	\item resources are never exchanged or otherwise processed directly
+ 	\item all interactions use \textit{resource representations}
+ \end{itemize}
+ Representations depend on various factors
+ \begin{itemize}
+ 	\item the nature of the resource
+ 	\item the capabilities of the server, communications medium, and client
+ 	\item requirements and constraints from the application scenario
+ 	\item negotiations to figure out the best representation
+ \end{itemize}
+ Representations are identified by \textit{media type} (sometimes called MIME type). There most used representations are:
+ \begin{itemize}
+ 	\item \textbf{XML}: a metalanguage (a language for representing languages) which is only syntax and has almost zero semantics. \\
+ 	XML is built around a tree model:
+ 	\begin{itemize}
+ 		\item each XML document is a tree and thus limited in structure
+ 		\item RESTful XML introduces hypermedia to turn XML data into a graph
+ 	\end{itemize}
+ 	 \pagebreak
+ 	\item \textbf{JSON (JavaScript Object Notation)}
+ 	\begin{itemize}
+ 		\item it encodes data as JavaScript objects
+ 		\item more efficient for a consumer written in JavaScript
+ 		\item turns an XML service into a JavaScript-oriented one
+ 		\item for large-scale applications, it might make sense to provide XML and JSON at choice (this can be negotiated with HTTP content negotiation)
+ 	\end{itemize}
+ \end{itemize}
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/xml-vs-json}
+ \hspace*{\fill}
+ \caption{XML (left) vs JSON (right)}
+ \end{figure}
+\paragraph{\uline{Resource discovery}} Essential for using \textit{Hypermedia Driving Applicaton State}. RPC-oriented systems needed to expose the available functions, which are essential for interacting with a service. \\
+ RESTful systems use a \textit{Uniform interface}
+ \begin{itemize}
+ 	\item No need to learn about functions
+ 	\item \uline{But how to find resources?}
+ 	\item Find them by following links from other resources
+ 	\item Learn about them by using URI Templates
+ 	\item Understand them by recognizing representations
+ \end{itemize}
+ REST does not care about URI details (e.g., \textit{https://www.someapp.com/catalogs/2012/winter/shirts}). \\
+ Apart from the scheme, URIs should be semantically opaque:
+ \begin{itemize}
+ 	\item media types should not guessed by URI (breaks content negotiation)
+ 	\item semantics should not be inferred from inspecting URIs
+ 	\item URIs should not be guessed based on previously encountered URIs
+ \end{itemize}
+ Technically speaking, URI templates are not required by REST. Practically speaking, URI templates are a useful best practice. All URI navigable resources should also be navigable using representations.
+ \pagebreak
+\paragraph{\uline{State Management}} 
+Essential for supporting \textit{Stateless Interactions}.\\ Cookies are a frequently used mechanism for managing state:
+\begin{itemize}
+	\item in many cases they are used for maintaining session state (login/logout)
+	\item more convenient than having to embed the state in every representation
+	\item some Web frameworks switch automatically between cookies and URI rewriting
+\end{itemize}
+Cookies have two interesting client-side side-effects:
+\begin{itemize}
+	\item they are stored persistently independent from any representation
+	\item they are a shared state within the context of one browser
+\end{itemize}
+Session ID cookies require expensive server-side tracking:
+\begin{itemize}
+	\item not associated with any resource and thus potentially global
+	\item load-balancing must be cookie-sensitive or cookies must be global
+\end{itemize}
+\textit{Resource-based state} allows RESTful services.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/state-client}
+ \hspace*{\fill}
+ \caption{State in the client}
+ \end{figure}
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/state-application}
+ \hspace*{\fill}
+ \caption{State in the application}
+ \end{figure}
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/state-resource}
+ \hspace*{\fill}
+ \caption{State in the resource}
+ \end{figure}
+ \pagebreak
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/session-scenarios-example}
+ \hspace*{\fill}
+ \caption{Typical session scenarios can be mapped to resources}
+ \end{figure}
+ Stateless session interaction is more than just renaming session to resource:
+ \begin{itemize}
+ 	\item all relevant data is stored persistently on the server
+ 	\item the shopping cart's URI can be used by other services for working with its contents (e.g., allow access to resource from both web and mobile applications)
+ 	\item instead of \textit{hiding the cart in the session}, it is \textit{exposed as a resource}
+ \end{itemize}
+ \paragraph{\uline{An Example of REST design}}
+ A bookmark and tag management service, with the following functions:
+ \begin{itemize}
+ 	\item Get a list of all our bookmarks and to filter that list by tag or date or limit by number
+   \item Get the number of bookmarks created on different dates 
+   \item Get the last time we updated our bookmarks
+   \item Get a list of all our tags
+	\item Add a bookmark
+	\item Edit a bookmark 
+	\item Delete a bookmark 
+	\item Rename a tag
+ \end{itemize}
+ Two first class objects: \textbf{bookmarks} and \textbf{tags} exposed as resources at the URL paths:
+ \begin{itemize}
+ 	\item \textit{http://someApp/api/[username]/bookmarks} 
+ 	\item \textit{http://SomeApp/api/[username]/tags}
+ \end{itemize}
+ where [username] is the username of the users bookmarks one wants to retrieve. The username is added into the URL to make the URL self-sufficient for identification, not to resort to authentication-level mechanisms. \nline
+ For what concerns representation, one could use XML document types for representing resources with the following nodes:
+ \begin{itemize}
+ 	\item $bookmarks$: A list of bookmarks
+  	\item $bookmark$: A single bookmark
+	\item $bookmarkcount$: Count of bookmarks per date 
+	\item $update$: When the bookmarks were last updated
+	\item $tags$: A list of tags
+	\item $tag$ A single tag
+ \end{itemize}
+ \pagebreak
+ \begin{figure}[h!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{images/rest-op-ex1}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{images/rest-answer-ex1}
+\end{minipage}
+\caption{Example of operation to get all bookmarks and its response}
+\end{figure}
+ \begin{figure}[h!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{images/rest-op-ex2}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{images/rest-answer-ex2}
+\end{minipage}
+\caption{Example of operation to get info on a specific bookmarks and its response}
+\end{figure}
+\paragraph{\uline{Conclusions}}
+REST is simple to learn and use. \\
+Unlearning RPC in most cases is the hardest part:
+\begin{itemize}
+	\item Object Oriented programming is all about identifying class and methods
+	\item distributed systems very often are build around RPC models
+	\item many classical IT architectures are RPC-centric by design
+\end{itemize}
+REST and RPC do not mix.
+\begin{itemize}
+	\item resource orientation $\leftrightarrow$ function orientation
+	\item cooperation $\leftrightarrow$ integration
+	\item openly distributed $\leftrightarrow$ hiding distribution
+	\item coarse-grained $\leftrightarrow$ fine-grained
+	\item complexity in resources formats $\leftrightarrow$ complexity in function sets
+\end{itemize}
+\subsubsection{Challenges}
+\paragraph{\uline{Crawiling}} 
+Problem: getting a lot of data points from an API (AKA. when one call is not enough). \nline
+\textit{“An API Crawler is a software that methodically interacts with a WebAPI to download data or to take some actions at predefined time intervals.”}
+\paragraph{\uline{Pagination and Timelines}}
+Like SQL queries and Web search engines, most APIs support
+\textbf{data pagination} to split huge chunks of data into smaller set of data. Smaller chunks of data are easier to create, transfer (avoid long response time), cache and require less server computation time.  \\
+\pagebreak
+Most of the Social Networks leverage on the concept of timelines instead of standard pagination to iterate through results.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/challenges-page1}
+ \hspace*{\fill}
+ \caption{An ideal pagination (Twitter example)}
+ \end{figure} \\
+The problem is that data are continuously added to the top of the Twitter timeline. So the next request request can lead to retrieving the already processed tweets.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/challenges-page2}
+ \hspace*{\fill}
+ \end{figure} \\
+ The solution is to use the \textbf{cursoring} technique. Instead of reading from the top of the timeline we read the data relative to the already processed ids.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/challenges-page3}
+ \hspace*{\fill}
+ \end{figure}
+ \pagebreak
+ \paragraph{\uline{Parallelization}} 
+When possible make parallel requests to gather more data in less time. \nline
+\uline{Example:} \\
+Get all the media from Instagram about \textit{\@potus} and \textit{\#trump}.\nline
+We can make two parallel requests (one for each tag) and paginate
+the results instead of waiting for the first tag to finish.
+Some time this is not possible due to the requests interdependency like in pagination; each request depends on the result of previous one.
+
+ \paragraph{\uline{Multiple Accounts}} 
+ Handling multiple accounts can increase the system throughput but increases the complexity of the system.
+\nline
+Strategies to handle multiple accounts:
+\begin{itemize}
+	\item Request based
+	\begin{itemize}
+		\item Round Robin
+		\item Account Pool
+	\end{itemize}
+	\item Accound based
+	\begin{itemize}
+		\item Requests stack
+	\end{itemize}
+\end{itemize}
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/multi-account-rr}
+ \hspace*{\fill}
+ \caption{\textbf{Round Robin}: The account through which the request is made is chosen using the round-robin strategy.}
+ \end{figure}
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/multi-account-pool}
+ \hspace*{\fill}
+ \caption{\textbf{Account Pool}: The account through which the request is made is chosen sequentially until it’s rate limit is reached, then we use the next available one.}
+ \end{figure}
+ \pagebreak
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/multi-account-stack}
+ \hspace*{\fill}
+ \caption{\textbf{Requests Stackl}: This strategy overturn the roles. Now the accounts, in parallel, get the next request to do from the pool. Once an account completes a request the cycle restarts until the pool is empty.}
+ \end{figure}
+ \paragraph{\uline{Fill Gaps}}
+ Sometimes the API does not give us all the data we want, so we need to fill those gaps. On quantity or time (Twitter) or on quality/content (Foursquare).
+ \begin{itemize}
+ 	\item \uline{Example}: Twitter time limited data. We need to access data older then 10 days.
+	\item \uline{Example where we need to build our own timeline}
+\begin{itemize}
+	\item Foursquare check-ins timeline not available. 
+	\item Facebook like timestamps not available.
+\end{itemize} 
+ \end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/use-case-urbanscope}
+ \hspace*{\fill}
+ \caption{Use case - UrbanScope (Twitter crawler)}
+ \end{figure}
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/use-case-urbanscope-ex}
+ \hspace*{\fill}
+ \caption{Use case - UrbanScope - Explore Tweets}
+ \end{figure}
+ \pagebreak
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/use-case-urbanscope-foursquare}
+ \hspace*{\fill}
+ \caption{Use case - UrbanScope (Foursquare)}
+ \end{figure}
+ \subsection{Scraping}
+ \textit{
+“Web scraping means collecting information from websites by extracting them directly from the HTML source code.”}
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/web-scraper-lascala}
+ \hspace*{\fill}
+ \caption{Use Case - La Scala (Scraper)}
+ \end{figure} \\
+ Once we have all the data we can extract the required data using the following pipeline:
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/web-scraper-lascala2}
+ \hspace*{\fill}
+ \end{figure}  \\
+ \paragraph{\uline{Scraping}}
+ \begin{itemize}
+ \item Pre-packaged headless browsers
+ \begin{itemize}
+ 	\item PhantomJS for JavaScript
+ 	\item Selenium Library
+ 	\item Study and replicate/simulate navigation programmatively
+ \end{itemize}
+ \item  Manual implementation of navigations
+ \begin{itemize}
+ 	\item Replicate JS (AJAX) invocations
+ 	\item Capture the data from the page
+ 	\item Marshall the data
+ \end{itemize}
+ \end{itemize}
 \clearpage
 
 
@@ -2987,6 +3444,12 @@ Let’s say we want to join a stream of advertisement impressions (when an ad wa
 
 \bibitem{spark-rdd}
 \newblock \href{https://intellipaat.com/blog/tutorial/spark-tutorial/programming-with-rdds/}{Spark RDDs}
+
+\bibitem{data-acquisition}
+\newblock \href{https://www.firstsanfranciscopartners.com/blog/defining-data-acquisition-importance/?cn-reloaded=1}{Defining Data Acquisition}
+
+\bibitem{bonus-rest}
+\newblock \href{https://medium.com/swlh/how-to-rest-api-a-tale-of-node-js-express-and-typescript-77bc598b280c}{Bonus: How to implement a REST API}
 
 \end{thebibliography}
 
