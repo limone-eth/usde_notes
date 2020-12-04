@@ -2891,8 +2891,231 @@ Let’s say we want to join a stream of advertisement impressions (when an ad wa
  \hspace*{\fill}
  \caption{Managing Streaming Queries}
  \end{figure} 
+
+\pagebreak
+\section{InfluxDB \& Flux}
+\subsection{What is InfluxDB 2.0}
+InfluxDB is a Common Metrics and Event Platform born to be the platform of choice for all metrics and event workloads.
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/influxdb}
+ \hspace*{\fill}
+ \end{figure} 
+Platform features:
+\begin{itemize}
+	\item \textbf{Instrument}
+	\begin{itemize}
+		\item Quickly ingest data from everywhere
+		\item Efficiently store (and compress) the data at scale
+	\end{itemize}
+	\item \textbf{Observe}
+	\begin{itemize}
+		\item Support real-time query, analysis and visualization of large data sets
+		\item Provide time-based functions for "change over time"
+	\end{itemize}
+	\item \textbf{Learn}
+	\begin{itemize}
+		\item Enable machine learning and anomaly detection
+		\item Provide streaming analytics for data in motion
+	\end{itemize}
+	\item \textbf{Automate}:
+	\begin{itemize}
+		\item Provide automation and control functions
+		\item Evict and down-sample date
+	\end{itemize}
+\end{itemize}
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=150pt]{images/influxdb-demo1}
+ \hspace*{\fill}
+ \vspace{0.3em}
+ \center
+  \hfill \includegraphics[width=250pt]{images/influxdb-demo2}
+ \hspace*{\fill}
+ \caption{This is a typical InfluxDB dashboard, which in the specific case is used to keep track of the water distribution in the city.}
+ \end{figure} 
+\subsection{How does it work?}
+\subsubsection{How data is ingested in InfluxDB}
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=350pt]{images/influxdb-line-chart}
+ \hspace*{\fill}
+ \caption{Anatomy of a Time-Series Line Graph}
+ \end{figure} 
+ \textbf{InfluxDB Data Model at conceptual level:}
+ \begin{itemize}
+ 	\item \textbf{Measurement}: the name of the measurement used as high-level grouping of data
+ 	\item \textbf{Tag set}: other lower-level grouping criteria of data
+ 	\item \textbf{Field set}: actual data
+ 	\item \textbf{Timestamp}: time of the data (better if indicates the time the data is observed)
+ 	\item \textbf{Series}: data points in time order grouped by measurements and tags
+ \end{itemize}
+  \textbf{InfluxDB Data Model at logical level:}
+ \begin{itemize}
+ 	\item \textbf{Measurement}: a name to group data at high level (a fact that may include multiple fields)
+ 	\item \textbf{Tag set}: a set of key-value pairs to group data at low level (values are strings)
+ 	\item \textbf{Field set}: a set of key-value pairs to represent data (values are numerical \& strings)
+ 	\item \textbf{Timestamp}: time of the data with nanosecond precision
+ 	\item \textbf{Series}: a unique combination of measurement+tags
+ \end{itemize}
+
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/influxdb-data-model-ingestion}
+ \hspace*{\fill}
+ \caption{Data model vs ingestion \& storage. Buckets are containers for series, similar to the topic  concept in Kafka. Each record ingested consists of a measurement, tag set, field set and timestamp.}
+ \end{figure} 
  \pagebreak
+ \textbf{The InfluxDB Data Model at physical level}
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/influxdb-line-protocol}
+ \hspace*{\fill}
+ \caption{Each event/observation is described using the Line Protocol. This specific event refers to an observation of temperature and humidity from a sensor placed in "ovenA" in the "west" line of an industry.}
+ \end{figure} 
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/influxdb-bucket-columnar}
+ \hspace*{\fill}
+ \caption{Bucket physical view - Columnar data store are the best column selection and aggregation thanks to disk+memory locality and cache locality.}
+ \end{figure} 
+      \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/influxdb-line-protocol-ex}
+ \hspace*{\fill}
+ \caption{Line protocol representations of two metrics.}
+ \end{figure}  \\
+ InfluxDB uses \href{https://docs.influxdata.com/telegraf/v1.16/}{Telegraf} as a data collection agent. Telegraf is a plugin-driven server agent for collecting \& reporting metrics, and is the first piece of the TICK stack. Telegraf has plugins to source a variety of metrics directly from the system it’s running on, pull metrics from third party APIs, or even listen for metrics via a statsd and Kafka consumer services. It also has output plugins to send metrics to a variety of other datastores, services, and message queues, including InfluxDB, Graphite, OpenTSDB, Datadog, Librato, Kafka, MQTT, NSQ, and many others.
  
+ \subsection{Flux}
+ \subsubsection{Introduction}
+ \textbf{Why Flux?} \\
+ \textit{"I don't want to have to write query code in one language and processing code in another language."} - Paul Dix (CTO InfluxData) \nline
+ \textbf{What is Flux} \\
+ Flux is a functional data scripting language designed for querying, analyzing, and acting on time series data. Its takes the power of InfluxQL and the functionality of TICKscript and combines them into a single, unified syntax. \nline
+ Flux is designed to be:
+ \begin{itemize}
+ 	\item Useable: easy to learn
+ 	\item Readable: developers read more code than we write
+ 	\item Extensible: developers can extend the language
+ 	\item Composable: developers can build onto the language
+ 	\item Testable: queries are code
+ 	\item Contributable: open source contributions matter
+\end{itemize}
+ Its syntax is largely inspired by 2018’s most popular scripting language, Javascript, and takes a functional approach to data exploration and processing.
+ 
+\subsubsection{Basics}
+Follow \href{https://docs.influxdata.com/influxdb/v1.8/flux/guides/}{this guide} to understand how to perform queries on Flux.
+ 
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/flux-basics-1}
+ \hspace*{\fill}
+ \vspace{0.3em}
+ \center
+  \hfill \includegraphics[width=200pt]{images/flux-basics-2}
+ \hspace*{\fill}
+ \caption{Basic Flux Language Elements.}
+ \end{figure} 
+ \textbf{Flux Data Model} \\
+Flux employs a basic data model built from basic data types. The data model consists of tables, records, columns and streams.
+\begin{itemize}
+	\item A \textbf{record} is a tuple of named values and is represented using a record type.
+	\item A \textbf{column} has a label and a data type (bool, int, string, bytes...)
+	\item A \textbf{table} is set of records with a common set of columns and a \textbf{group key}. The group key is a list of columns. A table’s group key denotes which subset of the entire dataset is assigned to the table. All records within a table will have the same values for each column that is part of the group key. These common values are referred to as the “group key value” and can be represented as a set of key value pairs.
+	\item A \textbf{stream} represents a potentially unbounded set of tables. A stream is grouped into individual tables using their respective group keys. Tables within a stream each have a unique group key value.
+\end{itemize}
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/from-bucket-to-tables}
+ \hspace*{\fill}
+ \caption{From buckets to tables.}
+ \end{figure} 
+\pagebreak
+ \textbf{Query Process} \\
+ For each table:
+ \begin{itemize}
+ 	\item Convert incoming rows into 0 or more outgoing rows
+ 	\item Map outgoing rows to tables
+ \end{itemize}
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/flux-query-process}
+ \hspace*{\fill}
+ \caption{The query applied on the first tables gives an empty result, while in the other tables some data satisfy the applied filter.}
+ \end{figure} 
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/flux-query-life}
+ \hspace*{\fill}
+ \caption{The life of a Flux Query.}
+ \end{figure} 
+ \subsubsection{Shaping and Processing}
+     \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/flux-elements}
+ \hspace*{\fill}
+ \caption{All Flux language elements.}
+ \end{figure} 
+      \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/flux-shape-process}
+ \hspace*{\fill}
+ \end{figure} 
+ \pagebreak
+      \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/flux-aggregator}
+ \hspace*{\fill}
+ \caption{Flux Aggregator}
+ \end{figure} 
+      \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/flux-selector}
+ \hspace*{\fill}
+ \caption{Flux Selector. \textcolor{red}{Note that there is an error here: \_value for GroupKey[humidity] should be 20, \_value for GroupKey[temp] should be 130.}}
+ \end{figure} 
+ 
+ \subsubsection{Windowing}
+ We don’t necessarily need to see every data point represented in our results, especially if we’re interested in trends and changes over time. In this case, we want to window and aggregate our data, meaning that we want to split our output by some window of time and then find the average for that window. \\
+ Moreover, we know that streams are infinite in nature, while processing can end only if the input is finite. That's why a \textbf{window operator} is needed to select a finite portion of the stream. Indeed, Flux includes a window operator that builds table tumbling across the results of the time range operator (e.g., \textit{ aggregateWindow(every: 60m, fn: mean)})
+       \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/flux-window}
+ \hspace*{\fill}
+ \caption{Example of thumbling window}
+ \end{figure}
+    \begin{figure}[ht!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/flux-window-ex1}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/flux-window-ex2}
+\end{minipage}
+\caption{Window from 10 to 11, and from 11 to 12.}
+\end{figure}
+\pagebreak
+\subsubsection{Joining Time Series}
+ In an easy world in which time-series are synchronized, it's just a join.
+  \begin{figure}[ht!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/flux-join}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/flux-join2}
+\end{minipage}
+\caption{Example of join between 2 tables (if time-series were synchronized).}
+\end{figure} \\
+ But time-series are rarely synchronized, so we use a thumbling window to synchronize them.
+   \begin{figure}[ht!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/flux-join-unsync}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/flux-join-unsync2}
+\end{minipage}
+\end{figure}
+ 
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/flux-join-unsync3}
+ \hspace*{\fill}
+\caption{Joining time-series using thumbling windows.}
+ \end{figure} 
+ 
+ \subsubsection{Tasks}
+ 
+ \pagebreak
+
  \section{Data Acquisition}
  \subsection{Intro}
   \begin{figure}[ht!]
