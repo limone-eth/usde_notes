@@ -3113,6 +3113,71 @@ Flux employs a basic data model built from basic data types. The data model cons
  \end{figure} 
  
  \subsubsection{Tasks}
+ An InfluxDB \textbf{task} is a scheduled Flux script that takes a stream of input data, modifies or analyzes it in some way, then stores the modified data in a new bucket or performs other actions.
+ 
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/flux-tasks}
+ \hspace*{\fill}
+ \caption{Flux tasks continuously write back to the storage the result of the analysis}
+ \end{figure} 
+ 
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/flux-tasks-to}
+ \hspace*{\fill}
+ \caption{Writing into a bucket using \textcolor{blue}{to()}}
+ \end{figure} 
+ 
+ \pagebreak
+ 
+ Tasks are written in the Flux language:
+ \begin{itemize}
+ 	\item No need to learn a separate language to write tasks
+ 	\item No need to use separate tools for debugging tasks
+ 	\item Tasks define all options withing the script for portability
+ 	\item Task options define specific information about the task
+ 	  \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/flux-tasks-opt}
+ \hspace*{\fill}
+ \end{figure} 
+ \item Tasks are self contained and can be imported / exported
+ \end{itemize}
+ 
+ \subsubsection{Time Series Enrichment}
+ Flux can also be used to enrich your time series data with other SQL data stores (Postgres, Microsoft SQL Server, SQLite, and SAP Hana) along with cloud-based data stores (Google Bigtable, Amazon Athena, and Snowflake). Enriching time series data provides context that can provide further insights into your data.
+ 
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/flux-time-series-enrich}
+ \hspace*{\fill}
+ \caption{Time Series Enrichment - the Intuition}
+ \end{figure} 
+ 
+ \begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/flux-timeseries-enrich-ex}
+ \hspace*{\fill}
+ \caption{Enriching our time-series with a static MySQL source.}
+ \end{figure} 
+ 
+\pagebreak 
+ 
+ \subsubsection{Advanced Time Series Analytics}
+ Holt-Winter's method is used for forecasting time series data that exhibits both a trend and a seasonal variation.
+  \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/flux-holt-winter}
+ \hspace*{\fill}
+ \caption{Holt-Winter's method}
+ \end{figure} 
+ 
+   \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/flux-forecasting}
+ \hspace*{\fill}
+ \caption{Forecasting with Holt-Winter's method}
+ \end{figure} 
+ 
+    \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/flux-holt-winter-ex}
+ \hspace*{\fill}
+ \caption{Holt-Winter's in Flux}
+ \end{figure} 
  
  \pagebreak
 
