@@ -3639,6 +3639,225 @@ Strategies to handle multiple accounts:
  	\item Marshall the data
  \end{itemize}
  \end{itemize}
+ 
+ \pagebreak
+
+
+\section{Data Wrangling} 
+ 
+ \subsection{Introduction}
+ \subsubsection{What is Data Wrangling}
+\textbf{Data Wrangling} is the process of cleaning, structuring and enriching raw data into a desired format for better decision making in less time. Data wrangling is increasingly ubiquitous at today’s top firms. Data has become more diverse and unstructured, demanding increased time spent culling, cleaning, and organizing data ahead of broader analysis. At the same time, with data informing just about every business decision, business users have less time to wait on technical resources for prepared data.
+\nline
+This necessitates a self-service model, and a move away from IT-led data preparation, to a more democratized model of self-service data preparation or data wrangling. This self-service model with data wrangling tools allows analysts to tackle more complex data more quickly, produce more accurate results, and make better decisions. Because of this ability, more businesses have started using data wrangling tools to prepare before analysis.
+ \subsubsection{Conventional Definition of Data Quality}
+ \textbf{Data quality} indicates how reliable a given dataset is. The data’s quality will affect the user’s ability to make accurate decisions regarding the subject of their study. For example, if the data is collected from incongruous sources at varying times, it may not actually function as a good indicator for planning and decision-making.
+\nline
+There are five common dimensions of data quality standards. Other standards may vary from project to project, but will often consist of the following criteria:
+\begin{itemize}
+	\item \textbf{Accuracy}: ensuring that values are correct and closely reflecting the reality of the results. 
+	\item \textbf{Completeness}: ask what essential fields have to be filled in for a dataset to be considered complete. For example, Name and address may be crucial to the completeness of the data, while a customer’s gender is less essential. 
+	\item \textbf{Uniqueness}: checks that entities are recorded once  and that data conforms to certain business rules
+	\item \textbf{Timeliness}: refers to whether decisions marketers have data insights at the optimal time, and how current the data is.  Do you have the data when you need it, and are you referencing the most up to date version of the dataset?
+	\item \textbf{Consistency}: all iterations of a piece of data should be the same. Take a given month’s web traffic for example - in every report, platform, or spreadsheet, is the number of website visits in that month the same? Or, are there inconsistencies across these data? A lack of consistency in these points could lead to confusion down the road. 
+\end{itemize}
+\subsubsection{Problems with assessing Data Quality}
+\begin{itemize}
+	\item \textbf{Unmeasurable}: accuracy and completeness are extremely difficult, perhaps impossible to measure.
+	\item \textbf{Context independent}: not accounting for what is important (e.g., if you are computing aggregates, you can tolerate a lot of inaccuracy).
+	\item \textbf{Incomplete}: we can't assess how much our data is incomplete. What about interpretability, accessibility, metadata analysis etc.
+	\item \textbf{Vague}: the conventional definitions provide no guidance towards practical improvements of the data
+\end{itemize}
+\pagebreak
+\subsection{When Data is Wrong}
+Possible attitudes w.r.t. bad quality data:
+\begin{itemize}
+	\item \textbf{The skeptic approach}: "who cares about data quality"
+	 \begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/data-skeptic}
+ \hspace*{\fill}
+ \end{figure}
+	\item \textbf{The pragmatic approach}: "use data even if it's bad"
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/data-pragmatic}
+ \hspace*{\fill}
+ \end{figure}
+	\item \textbf{The (pseudo) practitioner approach}: "averaging bad data does not solve the problem"
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/data-practitioner}
+ \hspace*{\fill}
+ \end{figure}
+\end{itemize}
+All the above approaches are wrong of course. This because the main goal that we want to achieve analyzing data is to improve our business, learning from insights to get better decisions. \nline
+Using "bad data" in this process is risky and may damage our business! 
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/bad-data-risk}
+ \hspace*{\fill}
+ \caption{The Vicious Cycle of Bad Data}
+ \end{figure} \\
+ According to a \href{http://www.gartner.com/document/3173924?ref=solrAll&refval=167174154&qid=79dcc82b7579c163c9be01f075925356}
+{Gartner Report}, "by 2017, 33\% of the largest global companies will experience an information crisis due to their inability to adequately value, govern and trust their enterprise
+information".
+\pagebreak
+\subsection{Making a Wrong Right}
+\subsubsection{How Data Wrangling helps us}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=250pt]{images/data-wrangling-is}
+ \hspace*{\fill}
+ \end{figure} 
+ Data Wrangling helps us solving this problem. Data Wrangling is the process of transforming "raw" data into data that can be analyzed to generate valid actionable insights. Often data scientists spend more time on preparing data than on analyzing it. \\
+ Data Wrangling a.k.a
+ \begin{itemize}
+ 	\item Data Preprocessing
+	\item Data Preparation
+	\item Data Cleansing
+	\item Data Scrubbing
+	\item Data Munging
+	\item Data Transformation
+	\item Data Fold, Spindle, Mutilate...
+	\item (good old) ETL
+ \end{itemize}
+ETL refers to the process of extracting, transforming, and loading data into a new host source, such as a data warehouse. It’s a necessary process if you want to optimize your data for analytics. In other words, it's a batch oriented process for data integration which includes data cleaning, preparation and load.
+\nline
+We can consider the Data Wrangling process as an evolution of ETL.
+Data Wrangling steps:
+\begin{enumerate}
+	\item \textbf{Understand}: in this step, the data is to be understood more deeply. Before implementing methods to clean it, you will definitely need to have a better idea about what the data is about. Wrangling needs to be done in specific manners, based on some criteria which could demarcate and divide the data accordingly – these are identified in this step.
+	\item \textbf{Explore and Structure}: raw data is given to you in a haphazard manner, in most cases – there will not be any structure to it. This needs to be rectified, and the data needs to be restructured in a manner that better suits the analytical method used. Based on the criteria identified in the first step, the data will need to be separated for ease of use. One column may become two, or rows may be split – whatever needs to be done for better analysis.
+	\item \textbf{Transform}: all datasets are sure to have some outliers, which can skew the results of the analysis. These will have to be cleaned, for the best results. In this step, the data is cleaned thoroughly for high-quality analysis. Null values will have to be changed, and the formatting will be standardized in order to make the data of higher quality.
+	\item \textbf{Augment}: after cleaning, it will have to be enriched – this is done in the fourth step. This means that you will have to take stock of what is in the data and strategise whether you will have to augment it using some additional data in order to make it better. You should also brainstorm about whether you can derive any new data from the existing clean data set that you have.
+	\item \textbf{Shape}: the prepared wrangled data is published using an agreed format so that it can be used further down the line – that is its purpose after all. 
+\end{enumerate}
+\subsubsection{Data Cleansing}
+\textbf{Data cleansing} or \textbf{data scrubbing} is the act of \textbf{detecting and correcting (or removing) corrupt or inaccurate records} from a data set. 
+The term refers to identifying incomplete, incorrect, inaccurate, partial or irrelevant parts of the data and then replacing, modifying, filling in or deleting this dirty data.
+\pagebreak
+\paragraph{\uline{Why is Data "Dirty"?}} A list taken from \href{http://www.eiminstitute.org/resource-portals/data-quality/data-cleansing-a-dichotomy-of-data-warehousing/}{here} \nline
+
+\begin{itemize}
+	\item \textbf{Dummy Values}: How many times have we seen dummy values entered, such as a social security number of 999-99-9999, or customer age as 999, or zip code as 99999?
+	\item \textbf{Absence of Data}: One common reason for “dirty data” is the absence of data. This is not always attributable to lazy data entry habits, but to the fact that different business units may have different needs for existence of certain data values in order to run their operations. The department which originates mortgage loans may have a federal reporting requirement to capture the sex and ethnicity of a customer, whereas the department which originates consumer loans does not.
+	\item \textbf{Multi-purpose fields}: To make things even more interesting for the data warehouse developers, the two loan departments in the above example probably share the same operational systems for originating or servicing their loans. Here we find the data fields that are used for multiple purposes, where the same data value in a field ends up meaning many different things depending on (1) which department entered it and (2) on specific values in one, or better yet, in several other data fields.
+	\item \textbf{Cryptic data}: For example, let’s say that originally our hypothetical loan system tracked whether or not taxes were impounded on a mortgage loan. The code “I” may have been used to mean No, there is No [tax] Impound account. Let’s say that years later we started to impound for insurance. Since the code “I” was already being used for No Tax Impounds, “T” seemed like a “logical alternative” for No Insurance Impounds – all we’d have to remember is that they are both negative and switched. After a few more years we wanted to track certain FHA loans, which required no insurance. The code “T” was already being used to mean No, there is no insurance impound, but it had a different meaning from the new requirement, so the new code “F” was added. And, since we seem to be tracking “exceptions to payment processing” in this field, let’s add “E” as a catch all indicator for any and all exceptions.
+	\item \textbf{Contradicting data}: As the weeks fly by and we are really getting into this “dirty data” analysis, we discover contradicting information between two or more fields. For example, a property address on our file shows a Texas zip code and New York as the city and state address. By this time, we don’t trust anything we see and decide to check out the street address.
+	\item \textbf{Inappropriate use of fields}: We all have seen addresses constructed as address line1, address line 2, 3, etc., where address line 1 was originally intended to be used for personal first, middle, last name, or a company name, possibly preceded with an asterisk to indicate it is a business address (bad idea!), address line 2 for street number, direction, name, etc.
+	\item \textbf{Violation of business rules}: And how about all the data that violates the business rules? For example, an adjustable rate mortgage loan where the value of the minimum interest rate is higher than the value of the maximum interest rate, or where multiple interest rates are captured for fixed rate loans which only have one interest rate for the life of the loan.
+	\item \textbf{Reused primary keys}: One of the most critical “dirty data” issues the data warehouse developers encounter, is with reused primary keys. Since operational systems rarely store history beyond 90 or 180 days, primary key values are often reused. For example, a bank branch, we’ll call it branch number 84, which originated and is servicing over 1,000 mortgage loans totalling \$800,000,000 closes, and transfers the servicing of these loans to branch 207.  Within one year branch 84’s number is reassigned to a new branch which is located in a less affluent area and is starting to experience a high rate of foreclosures on its originated loans. Typically the affected 1,000 loans still show branch number 84 as the originating branch, and all of these loans are falsely credited to the performance of the new branch 84. At first glance and without further detailed analysis, it is not evident that the new branch 84 is not profitable.
+	\item \textbf{Non-unique identifiers}: An even more interesting twist exists when a physical branch has 2 or more identifiers. For example, a branch located at 10 Main Street may be identified as branch number 65 on the loan system and the investor system, but as branch number 389 on the checking system and the savings system. Another example is the case where one customer is identified by many different customer numbers. Many of us have experienced this situation with our bank or our telephone company where we get multiple mailings.
+	\item \textbf{Data integration problems}: Last but not least, we run into integration problems due to “dirty data”. These problems come in two flavors: Data that should be related, but cannot be, and data that is inadvertantly related but should not be. The latter happens most frequently when fields or records are being reused for multiple purposes. For example, banks customarily buy mortgage loans from other banks, and banks sell their own mortgage loans to various investors. If one operational loan sales system is used for both purchases and sales, and if the primary key of loan sellers can have the same values as the primary key of investors, and if sales are distinguished from purchases only through various flags or switches or certain value ranges in certain fields, it will require “jumping through some hoops”, i.e. extensive programming logic, to avoid associating a loan seller or an investor with the wrong type of transaction.
+\end{itemize}
+\subsubsection{Data Cleansing in practice}
+\begin{itemize}
+	\item \textbf{Parsing}: Parsing locates and identifies individual data elements in the source files and then isolates these data elements in the target files.
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/step-parsing}
+ \hspace*{\fill}
+ \end{figure} 
+	\item \textbf{Correcting}: Corrects parsed individual data components using sophisticated data algorithms and secondary data sources.
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/step-correcting}
+ \hspace*{\fill}
+ \end{figure} 
+	\item \textbf{Standardizing}: Standardizing applies conversion routines to transform data into its preferred (and consistent) format using both standard and custom business rules, as well as coherent measurement units, ...
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/step-standardizing}
+ \hspace*{\fill}
+ \end{figure} 
+ \pagebreak
+	\item \textbf{Matching}: Searching and matching records within and across the parsed, corrected and standardized data based on predefined business rules to eliminate duplications.
+	 \begin{figure}[h!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/step-matching}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/step-matching-2}
+\end{minipage}
+\end{figure}
+	\item \textbf{Consolidating}: Analyzing and \uline{identifying relationships} between matched records and consolidating/merging them into ONE representation.
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/step-consolidating}
+ \hspace*{\fill}
+ \end{figure} 
+\end{itemize}
+\subsubsection{Missing Data}
+\paragraph{\uline{Detection: Overtly Missing Data}}
+\begin{itemize}
+	\item Match data specifications against data - are all the attributes present?
+	\item Scan individual records - are there gaps?
+	\item Rough checks: number of files, file sizes, number of
+records, number of duplicates
+	\item Compare estimates (averages, frequencies, medians) with “expected” values and bounds; check at various levels of granularity since aggregates can be misleading
+\end{itemize}
+\paragraph{\uline{Hidden damage to data}}
+\begin{itemize}
+	\item Values are truncated or censored - check for spikes and dips in distributions and histograms
+	\item Missing values and defaults are indistinguishable - too many missing values? metadata or domain expertise can help
+ 	\item Errors of omission e.g. all calls from a particular area are missing - check if data are missing randomly or are localized in some way
+\end{itemize}
+\paragraph{\uline{Missing Values}}
+\begin{itemize}
+	\item Random: system failures, complete miss
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=150pt]{images/missing-data-failure}
+ \hspace*{\fill}
+ \end{figure} 
+ \pagebreak
+	\item Wrong Ingestion: CSV to table / excel
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/missing-data-ingestion}
+ \hspace*{\fill}
+ \end{figure} 
+	\item Inapplicability: partical data by nature
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/missing-data-inapplicability}
+ \hspace*{\fill}
+ \end{figure} 
+\end{itemize}
+In federated data, between 30\%-70\% of the data points will have at least one missing attribute - data wastage if we ignore all records with a missing value. The remaining data is seriously biased and this results in a lack of confidence in results. To solve this, is important to understand the pattern of missing data since it unearths data integrity issues.
+\paragraph{\uline{Missing Value Imputation}}
+\begin{itemize}
+	\item \textbf{Standalone imputation}: use mean, median or other point estimates assuming that the distribution of the missing values is the same as the non-missing values. Convenient, and easy to implement.
+	\item \textbf{Attribute relationships}: assuming that all prior attributes are populated, one could resort to regression or propensity score to predict the missing value.
+	\item \textbf{Arbitrary missing pattern}: assuming that data is multivariate normal, one could use Markov Chain Monte Carlo to induce monotonicity over data
+\end{itemize}
+\paragraph{\uline{Censoring and Truncation}} Well studied in Biostatistics, relevant to time dependent data e.g. duration.
+\begin{itemize}
+	\item \textbf{Censored}: Measurement is bounded but not precise e.g. Call duration > 20 are recorded as 20
+	\item \textbf{Truncated}: Data point dropped if it exceeds or falls below a certain bound e.g. customers with less than 2 minutes of calling per month
+\end{itemize}
+\begin{figure}[ht!]
+ \hfill \includegraphics[width=200pt]{images/censored-time-intervals}
+ \hspace*{\fill}
+ \caption{Censored Time Intervals}
+ \end{figure} 
+If the censoring/truncation mechanism is not known, analysis can be inaccurate and biased. But if you know the mechanism, you can mitigate the bias from the analysis. Metadata should record the existence as well as the nature of censoring/truncation.
+\pagebreak
+\paragraph{\uline{Suspicious Data and Outliers}}
+Consider the data points: 3, 4, 7, 4, 8, 3, 9, 5, 7, 6, 92. \nline
+“92” is suspicious - an outlier. \nline 
+Outliers are potentially legitimate data. Often, they are data or model glitches or, they could be a data miner’s dream, e.g. highly profitable customers. \\
+Many approaches to detect outliers:
+\begin{itemize}
+	\item Error bounds, tolerance limits – control charts
+	\item Model based – regression depth, analysis of residual
+	\item Geometric
+	\item Distributional
+	\item Time Series outliers
+\end{itemize}
+\begin{figure}[h!]
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/control-charts}
+  \caption{Example of control chart}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/bivariate-charts}
+    \caption{Bivariate control chart}
+\end{minipage}
+\end{figure}
 \clearpage
 
 
@@ -3738,6 +3957,9 @@ Strategies to handle multiple accounts:
 
 \bibitem{bonus-rest}
 \newblock \href{https://medium.com/swlh/how-to-rest-api-a-tale-of-node-js-express-and-typescript-77bc598b280c}{Bonus: How to implement a REST API}
+
+\bibitem{data-cleansing}
+\newblock \href{http://www.wideskills.com/data-warehousing/data-performance-cleansing-and-quality}{Data Performance Cleansing and Quality}
 
 \end{thebibliography}
 
