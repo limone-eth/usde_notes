@@ -3849,15 +3849,52 @@ Many approaches to detect outliers:
 \begin{figure}[h!]
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=.8\linewidth]{images/control-charts}
+  \includegraphics[width=.9\linewidth]{images/control-charts}
   \caption{Example of control chart}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=.8\linewidth]{images/bivariate-charts}
+  \includegraphics[width=.9\linewidth]{images/bivariate-charts}
     \caption{Bivariate control chart}
 \end{minipage}
 \end{figure}
+\pagebreak
+\subsection{Databases' problems}
+\subsubsection{Not all tables are created equal}
+	\begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/equal-tables1}
+ \hspace*{\fill}
+ \end{figure} 
+ 	\begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/equal-tables2}
+ \hspace*{\fill}
+ \end{figure} 
+ 	\begin{figure}[ht!]
+ \hfill \includegraphics[width=300pt]{images/equal-tables3}
+ \hspace*{\fill}
+ \end{figure} 
+ \pagebreak
+ \subsubsection{The "Key" (matching) problem}
+ Keys are crucial in databases... usually many DBs correspond to many keys. How to align the key between databases? Is important to identify different records in different databases referring to the same entity (e.g., same user match between Facebook, Instagram, Twitter etc.).
+ \nline
+ Related to this there is the \textbf{duplicates problem}. Which consists of identifying to certain degree of accuracy likely-duplicates. \nline
+ \subsubsection{Lesson learnt on tables}
+ \begin{itemize}
+ 	\item Multiple) variables in columns
+ 	\item Never values as columns!
+ 	\item Shape may depend on convenience of queries
+ 	\item Matching identities and duplications are crucial in data science!
+ 	\item Each observation is complete and atomic
+ 	\item Each variable belongs to (only!) one column!
+ \end{itemize} 
+\subsubsection{Schema-On-Write Vs Schema-On-Read}
+Traditional DBMSs enforced writing only data consistent with a pre-designed schema. Today data modeling at design time is a luxury.
+In schema on read, data is applied to a plan or schema as it is pulled out of a stored location, rather than as it goes in. In this way we achieve more flexibility.
+
+\pagebreak 
+
+\section{Crowdsourcing}
+
 \clearpage
 
 
