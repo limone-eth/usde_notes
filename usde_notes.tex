@@ -2600,12 +2600,12 @@ There are two basic operations that can be done on RDDs. They are \textbf{transf
  \end{figure} \\
  These transformations are executed when they are invoked or called. Every time transformations are applied, a new RDD is created.
      \begin{figure}[ht!]
- \hfill \includegraphics[width=200pt]{images/spark-rdd-transformation-ex}
+ \hfill \includegraphics[width=300pt]{images/spark-rdd-transformation-ex}
  \hspace*{\fill}
  \caption{\textbf{Transformations - logical view.} Since RDD are immutable, transformations create new RDD.}
  \end{figure} 
       \begin{figure}[ht!]
- \hfill \includegraphics[width=200pt]{images/spark-rdd-transformation-physical}
+ \hfill \includegraphics[width=300pt]{images/spark-rdd-transformation-physical}
  \hspace*{\fill}
  \caption{\textbf{Transformations - physical view.}}
  \end{figure} 
@@ -2617,7 +2617,7 @@ There are two basic operations that can be done on RDDs. They are \textbf{transf
  \end{figure}  \\
  Whenever an action is called, the driver delegates tasks to workers, who then in turn return the answer to the driver whenever their execution is completed.
        \begin{figure}[ht!]
- \hfill \includegraphics[width=200pt]{images/spark-rdd-transformation-physical}
+ \hfill \includegraphics[width=200pt]{images/spark-rdd-actions-system}
  \hspace*{\fill}
  \caption{\textbf{Actions - system view.}}
  \end{figure}  \\
