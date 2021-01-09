@@ -4,3 +4,10 @@
 *.out
 *.aux
 *.dvi
+
+exam_preview_questions/*.log
+exam_preview_questions/*.synctex.gz
+exam_preview_questions/*.toc
+exam_preview_questions/*.out
+exam_preview_questions/*.aux
+exam_preview_questions/*.dvi

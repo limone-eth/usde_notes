@@ -3442,7 +3442,7 @@ Session ID cookies require expensive server-side tracking:
  \hfill \includegraphics[width=250pt]{images/session-scenarios-example}
  \hspace*{\fill}
  \caption{Typical session scenarios can be mapped to resources}
- \end{figure}
+ \end{figure} \\
  Stateless session interaction is more than just renaming session to resource:
  \begin{itemize}
  	\item all relevant data is stored persistently on the server
@@ -3549,7 +3549,7 @@ the results instead of waiting for the first tag to finish.
 Some time this is not possible due to the requests interdependency like in pagination; each request depends on the result of previous one.
 
  \paragraph{\uline{Multiple Accounts}} 
- Handling multiple accounts can increase the system throughput but increases the complexity of the system.
+Handling multiple accounts can increase the system throughput but increases the complexity of the system.
 \nline
 Strategies to handle multiple accounts:
 \begin{itemize}
@@ -3577,7 +3577,7 @@ Strategies to handle multiple accounts:
      \begin{figure}[ht!]
  \hfill \includegraphics[width=250pt]{images/multi-account-stack}
  \hspace*{\fill}
- \caption{\textbf{Requests Stackl}: This strategy overturn the roles. Now the accounts, in parallel, get the next request to do from the pool. Once an account completes a request the cycle restarts until the pool is empty.}
+ \caption{\textbf{Requests Stack}: This strategy overturn the roles. Now the accounts, in parallel, get the next request to do from the pool. Once an account completes a request the cycle restarts until the pool is empty.}
  \end{figure}
  \paragraph{\uline{Fill Gaps}}
  Sometimes the API does not give us all the data we want, so we need to fill those gaps. On quantity or time (Twitter) or on quality/content (Foursquare).
