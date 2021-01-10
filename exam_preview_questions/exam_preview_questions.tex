@@ -63,7 +63,6 @@ Data-driven organizations:
 
 \subsection{4 Vs of Big Data}
 BigData is a term that describes the large volume of data - both structured and unstructured - that inundates a business on a day-to-day-basis. IBM data scientists break big data into four dimensions:
-Volume (data at scale): volume is increasing, we have more and more data
 \begin{itemize}
 	\item \textbf{Volume} (data at scale): volume is increasing, we have more and more data
 	\item \textbf{Variety} (data in many form): structured, unstructured or semi-structured
@@ -83,7 +82,9 @@ Recently it became evident that data indeed represents incredible economic and s
 	\item \textbf{Transport}: getting the data (oil) to the right person, organization or software tool (to the petrol station)
 	\item \textbf{Usage}: while driving a car one consumes oil. Similarly, providing analysis results requires data
 \end{itemize}
-So the different stages from exploring crude oil to using it to drive a car also apply to data science. However, there are some important differences between data and oil:
+So the different stages from exploring crude oil to using it to drive a car also apply to data science. 
+
+\pagebreak However, there are some important differences between data and oil:
 \begin{itemize}
 	\item \textbf{Copying data is relatively easy and cheap}. While it is impossible to simply copy a product like oil.
 	\item \textbf{Data is specific, i.e., it relates to a specific event, object, and/or period}. Different data elements are not exchangeable. When going to a petrol station, this is very different; drops of oil are not preallocated to a specific car on a specific day.
@@ -161,7 +162,7 @@ Sharding is a common concept in scalable database architectures. By sharding a l
 \nline
 Although data replication can be demanding in terms of cost, computational, and storage requirements, businesses widely use this database management technique to achieve one or more of the following goals:
 \begin{itemize}
-	\item \textbf{Improve the availability of data}: one a node in the distributed system is down, data can still be access from another working node
+	\item \textbf{Improve the availability of data}: once a node in the distributed system is down, data can still be access from another working node
 	\item \textbf{Enhance server performance}: data replication reduces the load on the primary server by dispersing it among other nodes in the distributed system, thereby improving network performance
 	\item \textbf{Accomplish disaster recovery}:  Data replication facilitates the recovery of data which is lost or corrupted by maintaining accurate backups at well-monitored locations, thereby contributing to enhanced data protection.
 \end{itemize}
@@ -246,7 +247,7 @@ The main advantages of graph databases are on:
 \subsection{ACID vs. BASE}
 \textbf{ACID and BASE are two consistency models for data in transactions.}
 \nline
-\textbf{ACID is the consistency model used by traditional relational databases}, for this reason, has been the standard for some time. The key ACID guarantee is that it provides a safe environment in which to operate on your data. \\
+\textbf{ACID is the consistency model mainly used by traditional relational databases}, for this reason, has been the standard for some time. The key ACID guarantee is that it provides a safe environment in which to operate on your data. \\
 The ACID acronym stands for:
 \begin{itemize}
 	\item \textbf{Atomicity}: all operations in a transaction succeed or every operation is rolled back
@@ -290,6 +291,7 @@ It can be used as:
 	\item \textbf{Message broker}: Redis is not only a key-value store
 \end{itemize}
 \uline{Redis is not a replacement for Relational Databases nor Document stores. It might be used complementary to a SQL relational store, and/or NoSQL document store.} Even when Redis offers configurable mechanisms for persistency, increased persistency will tend to increase latency and decrease throughput.
+\textbf{Regarding the CAP theorem, Redis enforces Consistency and Partition Tolerance.}
 \nline
 When to use Redis:
 \begin{itemize}
@@ -314,16 +316,19 @@ Redis has offers different option for scaling purposes:
 	\end{itemize}
 
 	\item \textbf{Failover}: replace possible master that is broken with a slave
-Manual
-Automatic with Redis Sentinel
-Automatic with Redis Cluster
+	\begin{itemize}
+		\item Manual
+		\item Automatic with Redis Sentinel
+		\item Automatic with Redis Cluster
+	\end{itemize}
+
 \end{itemize}
 Redis offers 4 topologies, with different advantages:
 \begin{itemize}
 	\item \textbf{Standalone} (optional data redundancy on client-side)
 	\item \textbf{Sentinel} (automatic failover)
-	\item \textbf{Twemproxy} (distribute data)
-	\item \textbf{Cluster} (automatic failover)
+	\item \textbf{Twemproxy} (distributed data)
+	\item \textbf{Cluster} (automatic failover and distributed data)
 \end{itemize}
 
 \subsection{Cassandra}
@@ -337,7 +342,7 @@ Cassandra properties:
 	\item linear, elastic scalability
 	\item decentralized/symmetric (no master/slave) -> ring topology
 	\item automatic provisioning of new nodes 
-	\item \textbf{constant read complexity} -> O(1) DHT key-based query
+	\item \textbf{constant read complexity} $\rightarrow$ O(1) DHT key-based query
 \end{itemize}
 \textbf{Cassandra Cluster uses a gossip protocol to know which nodes are online and working.} Gossip is a peer-to-peer communication protocol in which nodes periodically exchange state information about themselves and about other nodes they know about. In the end all nodes quickly learn about all other nodes in the cluster.
 \nline
@@ -354,6 +359,7 @@ There are two kinds of replication strategies in Cassandra:
 	\item \textbf{Simple Strategy}: used when you have just one data center. It places the first replica on the node selected by the partitioner. After that, remaining replicas are placed in clockwise direction in the Node ring.
 	\item \textbf{Network Topology Strategy}: is used when you have multiple data centers. This strategy places replicas in the same datacenter by walking the ring clockwise until reaching the first node in another rack. NetworkTopologyStrategy attempts to place replicas on distinct racks because nodes in the same rack (or similar physical grouping) often fail at the same time due to power, cooling, or network issues.
 \end{itemize}
+\textbf{Regarding the CAP theorem, Cassandra concentrates on Availability and Partition tolerance.} Nonetheless, it has some levels of consistency. \\
 The Cassandra consistency level is defined as the minimum number of Cassandra nodes that must acknowledge a read or write operation before the operation can be considered successful. \textbf{Consistency level is tuneable in the sense that the user can configure the minimum number of nodes required to reach the quorum} (from one to all).
 \nline
 Keyspace is the outermost container for data in Cassandra. The basic attributes of a Keyspace are: 
@@ -370,7 +376,7 @@ Cassandra is a good fit when:
 \begin{itemize}
 	\item You need really fast writes (and reads)
 	\item You need durability
-	\item You have lots of data (> GBs)
+	\item You have lots of data ($>$ GBs)
 	\item You need a fluid data structure
 \end{itemize}
 
@@ -402,7 +408,7 @@ How do we move data between zones in the logical architecture of a big data plat
 \\
 To answer these questions, we have few dimensions that we have to think about: throughput, latency and message size. These dimensions matter when you want to understand how the solution space is organized.
 \nline
-Throughput indicates how much data we are able to ingest in a given time interval. It is the main performance indicator that we aim to optimize. Latency is the total time that we need to ingest all the data. Message size is the size of the messages that we transport. 
+Throughput indicates how much data we are able to ingest in a given time interval. It is the main performance indicator that we aim to optimize. Latency is the total time that we need to transport a message. Message size is the size of the messages that we transport. 
 Actually, our aim is to maximize throughput and minimize latency. By the way, this is not so easy. Indeed, there’s a trade-off between latency and throughput: high latency corresponds to high throughput while low latency corresponds to low throughput. 
 
 \subsection{Ultra-bulk vs. Batch vs. Continuous Data Ingestion \& Preparation}
@@ -484,22 +490,22 @@ There are 3 classes:
 	\item \textbf{Interval}: this model allows us to state if an event lasted for a given amount of time. Here it is possible to write even more complex queries like “Which are the meetings that last less than 5m?”, “Which are the meetings with conflicts?”. Previous cases’ queries are included.
 \end{itemize}
 
-\myparagraph{Types of windows: \{logical, physical\} x \{sliding, thumbling\}}
+\myparagraph{Types of windows: \{logical, physical\} x \{sliding, tumbling\}}
 		
 Windows are time intervals in which data is analysed. 
 There can be four types of windows:
 \begin{itemize}
 	\item \textbf{Logical Sliding}: a sliding window that covers the specified time intervals into the past
-	\item \textbf{Logical Thumbling}: thumbling window that batches events and releases them every specified time interval, with flow control options
+	\item \textbf{Logical Tumbling}: tumbling window that batches events and releases them every specified time interval, with flow control options
 	\item \textbf{Physical Sliding}: sliding window that covers the specified number of elements in the past
-	\item \textbf{Physical Thumbling}: thumbling window that batches events and releases them when a given minimum number of events has been collected
+	\item \textbf{Physical Tumbling}: tumbling window that batches events and releases them when a given minimum number of events has been collected
 \end{itemize}
 Not all the systems presented in class allows to perform queries using all these types of windows:
 \begin{itemize}
 	\item \textbf{EPL}: all types supported
-	\item \textbf{KSQL}: supports only logical thumbling and logical hopping windows
-	\item \textbf{Spark Structured Streaming}: supports only logical thumbling and logical hopping windows
-	\item \textbf{Flux}: partially supports logical and physical sliding windows, supports logical thumbling and hopping windows
+	\item \textbf{KSQL}: supports only logical tumbling and logical hopping windows
+	\item \textbf{Spark Structured Streaming}: supports only logical tumbling and logical hopping windows
+	\item \textbf{Flux}: partially supports logical and physical sliding windows, supports logical tumbling and hopping windows
 \end{itemize}
 
 \subsubsection{Complex Event Processing (CEP)}
@@ -546,9 +552,9 @@ Listeners to statements receive updated data as soon as the engine processes eve
 EPL supports all the window types:
 \begin{itemize}
 	\item Logical Sliding
-	\item Logical Thumbling
+	\item Logical Tumbling
 	\item Physical Sliding
-	\item Physical Thumbling
+	\item Physical Tumbling
 \end{itemize}
 
 \subsection{Kafka \& KSQL}
@@ -801,6 +807,14 @@ Moreover we know that streams are infinite in nature, while processing can end o
 \nline
 Flux also supports advanced time series analytics, in particular we can refer to \textbf{Holt-Winder’s method} which is used for forecasting time series data that exhibits both a trend and a seasonal variation.
 
+\myparagraph{Supported Window Types}
+Flux supports different window types:
+\begin{itemize}
+	\item Logical Sliding (partially supported)
+	\item Logical Tumbling
+	\item Physical Sliding (partially supported)
+	\item Logical Hopping
+\end{itemize}
 \section{Data Engineering \& Data Science Pipeline}
 \subsection{Data collection (scraping + API): trade off and features of scraping vs. API crawling}
 \myparagraph{Data Acquisition}
