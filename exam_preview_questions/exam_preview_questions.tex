@@ -414,13 +414,13 @@ Actually, our aim is to maximize throughput and minimize latency. By the way, th
 \subsection{Ultra-bulk vs. Batch vs. Continuous Data Ingestion \& Preparation}
 When dealing with latency-throughput trade-off there are at least three cases that are along a continuum.
 \begin{itemize}
-	\item The \textbf{Ultra Bulk} case is characterized by high throughput and high latency. We are talking about latency in terms of days and message size in terms of petabytes.
+	\item The \textbf{Ultra Bulk} case is characterized by high throughput and high latency. We are talking about latency in terms of days and message size in terms of petabytes. One and only big transfer of data. \\
 \uline{Example}:
-imagine that you have a data warehouse with petabytes of data and you would like to transfer this data on the cloud once for all. There are different solutions that you can use such as Ultra Wide Band (2,5 Gbps -> 37 days), Infinity Band (54 Gbps -> 1,7 days) and Google Transfer Appliance (2 days)
-	\item The \textbf{Continuous} case is characterized by low throughput and low latency. We are talking about latency in terms of ms and message size in terms of kilobytes. One and only big transfer of data.
+imagine that you have a data warehouse with petabytes of data and you would like to transfer this data on the cloud once for all. There are different solutions that you can use such as Ultra Wide Band (2,5 Gbps $\rightarrow$ 37 days), Infinity Band (54 Gbps $\rightarrow$ 1,7 days) and Google Transfer Appliance (2 days)
+	\item The \textbf{Continuous} case is characterized by low throughput and low latency. We are talking about latency in terms of ms and message size in terms of kilobytes. \\
 \uline{Example}:
-a real time inventory for a company that has many physical shops and also sells online through an e-commerce platform. You can use Kafka to build an event system that captures all the product purchases and updates the stock correspondingly. A lot of small messages running in the system at any time.
-	\item The \textbf{Batch} case has a balanced throughput-latency trade-off.
+a real time inventory for a company that has many physical shops and also sells online through an e-commerce platform. You can use Kafka to build an event system that captures all the product purchases and updates the stock correspondingly. A lot of small messages running in the system at any time. 
+	\item The \textbf{Batch} case has a balanced throughput-latency trade-off. \\
 \uline{Example}:
 Tracking customer journeys 360° by attaching a Change Data Capture process to all the different applications in your system. Then store the changes in a temporary blob storage. Finally each hour push the changes to a data warehouse that you use for analytics. Balanced size of messages and latency.
 \end{itemize}
@@ -439,6 +439,7 @@ Tracking customer journeys 360° by attaching a Change Data Capture process to a
 	\item All data are kept in immutable files
 	\item Append-only operations are allowed
 \end{itemize}
+\pagebreak
 The Batch approach allows for two options:
 \begin{itemize}
 	\item the \textbf{OVERWRITE} option in which the ingested table is overwritten each time, and a new view is used to map all the ingested table to a common structure
@@ -481,7 +482,7 @@ The Batch approach allows for two options:
 Data Stream Management Systems (DSMS) are used to manage streams of data. Data streams are unbounded sequences of time-varying data elements. They represent an almost continuous flow of information, with the recent information being more relevant as it describes the current state of a dynamic system. \\
 The nature of streams requires a paradigmatic change \textbf{from persistent data} (one time semantics) \textbf{to transient data} (continuous data flow, with static queries). Indeed, continuous queries can be registered over streams that are observed through “windows” (time intervals in which we are interested in analysing data).
 
-\myparagraph{Time representations (Causal, Absolute \& Interval} and implications on the types of queries one can ask
+\myparagraph{Time representations (Causal, Absolute \& Interval)} 
 The time model defines the relationship between information items and passing of time. It allows an Information Flow Processing system to associate some kind of happened-before (ordering) relationship to information systems. \\
 There are 3 classes:
 \begin{itemize}
@@ -622,7 +623,7 @@ In Kafka, events are captured by an event streaming platform into event streams.
 A stream:
 \begin{itemize}
 	\item provides immutable data
-	\item supports only inserting (appending) new events, whereas 	\item existing events cannot be changes
+	\item supports only inserting (appending) new events, whereas 	\item existing events cannot be changed
 	\item is persistent, durable and fault-tolerant
 	\item can have many events for one key
 \end{itemize}
@@ -646,7 +647,7 @@ We can observe that \uline{there is a close relationship between a stream and a 
 \myparagraph{KSQL}
 \textbf{KSQL is a streaming SQL engine for Apache Kafka.} KSQL lowers the entry bar to the world of stream processing, providing a simple and completely interactive SQL interface for processing data in Kafka. KSQL is distributed, scalable, reliable, and real time. It supports a wide range of powerful stream processing operations including aggregations, joins, windowing, sessionizations and much more.
 \nline
-Most databases are used for doing on-demand lookups and modifications to stored data. \textbf{•} - that is stream processing. So \textbf{KSQL runs continuous queries} (transformations that run continuously as new data passes through them) on streams of data in Kafka topics. In contrast, queries over a relational database are one-time queries that run once to completion over a dataset.
+Most databases are used for doing on-demand lookups and modifications to stored data. \textbf{KSQL doesn’t do lookups, what it does is continuous transformations} - that is stream processing. So \textbf{KSQL runs continuous queries} (transformations that run continuously as new data passes through them) on streams of data in Kafka topics. In contrast, queries over a relational database are one-time queries that run once to completion over a dataset.
 \nline
 KSQL uses Kafka’s Streams API internally and they share the same core abstractions for stream processing on Kafka. There are two core abstractions in KSQL that map to the two core abstractions in Kafka Streams and allow you to manipulate Kafka topics:
 \begin{itemize}
@@ -689,7 +690,7 @@ Dataset is an extension of DataFrame, thus we can consider a DataFrame an untype
 \pagebreak
 \subsubsection{Spark Principles}
 \myparagraph{Transformations vs. Actions}
-Transformations and Actions are two basic operations that characterize RDDs.
+Transformations and Actions are two basic operations that characterize RDDs. \nline
 \textbf{Transformations are functions that accept the existing RDDs as input and output one or more RDDs.} However, the data in the existing RDD in Spark does not change as it is immutable. Transformations are executed when they are invoked or called, and every time a transformation is applied, a new RDD is created (since RDD are immutable).
 Some example functions are: map, filter, union, intersection.
 \nline
@@ -709,7 +710,7 @@ The main benefits of this pattern are:
 \end{itemize}
 \myparagraph{Caching}
 Just like other big-data applications, Spark applications are sensitive to a number of factors that affect your ability to achieve the best performance.  And those factors can lie all over the stack.  \\
-One technique, caching, gets a lot of attention and discussion among big-data practitioners, namely because the decision of what data and how much data to cache, given finite memory available, can make a world of difference in the performance you achieve. 
+One technique, \textbf{caching}, gets a lot of attention and discussion among big-data practitioners, namely because the decision of what data and how much data to cache, given finite memory available, can make a world of difference in the performance you achieve. 
 \textbf{Caching is an optimization technique for iterative and interactive computations.} Caching \textbf{helps in saving interim, partial results so they can be reused in subsequent stages of computation.} These interim results are stored as RDDs (Resilient Distributed Datasets) and are kept either in memory (by default) or on disk.  Data cached in memory is faster to access, of course, but cache space is always limited.
 \subsubsection{Spark at Work}
 \myparagraph{Driver vs. Workers vs. Slots}
@@ -717,7 +718,7 @@ A spark cluster includes:
 \begin{itemize}
 	\item \textbf{One Driver} running the user application
 	\item \textbf{Multiple Executors} (typically, one instance per node) with multiple Slots (typically, one per core/CPU)
-	\item \textbf{Multiple Worker nodes} are in charge of hosting Executor processes
+	\item \textbf{Multiple Worker nodes} in charge of hosting Executor processes
 \end{itemize}
 The \textbf{Driver} assigns \textbf{Tasks} to \textbf{Executors’ Slots} for parallel execution. The Driver also makes sure that all tasks of a stage are executed before starting any task of the next stage.
 Executors store output data from tasks in memory or on disk. It is important to note that Workers and Executors are aware only of the tasks allocated to them, whereas the Driver is responsible for understanding the complete set of tasks and the respective dependencies that comprise an application.
@@ -744,7 +745,7 @@ The output can be defined in different modes:
 	\item \textbf{Update mode}: only the rows that were updated in the Result Table since the last trigger will be written to the external storage.
 \end{itemize}
 \myparagraph{Handling Event-time and Late Data}
-For many applications, you may want to operate on event-time. Event-time is the time embedded in the data itself. Using event-time allows window-based aggregations to be just a special type of grouping and aggregation on the event-time column. Furthermore, this model naturally handles data that has arrived later than expected based on its event-time. Since Spark is updating the Result Table, it has full control over updating old aggregates when there is late data, as well as cleaning up old aggregates to limit the size of intermediate state data. Since Spark 2.1, we have supported watermarking which allows the user to specify the threshold of late data, and allows the engine to accordingly clean up old state.
+For many applications, you may want to operate on event-time. Event-time is the time embedded in the data itself. Using event-time allows window-based aggregations to be just a special type of grouping and aggregation on the event-time column. Furthermore, this model naturally handles data that has arrived later than expected based on its event-time. Since Spark is updating the Result Table, it has full control over updating old aggregates when there is late data, as well as cleaning up old aggregates to limit the size of intermediate state data. Since Spark 2.1, we have supported \textbf{watermarking} which allows the user to specify the threshold of late data, and allows the engine to accordingly clean up old state.
 
 \myparagraph{Stream-to-stream joins}
 \textbf{Structured Streaming supports joining (only INNER and LEFT-OUTER variants) a streaming Dataset/DataFrame with a static Dataset/Dataframe as well as another streaming Dataset/DataFrame.} The challenge of generating join results between two data streams is that, at any point in time, the view of the dataset is incomplete for both sides of the join making it much harder to find matches between inputs. Any row received from one input stream can match with any future, yet-to-be-received row from the other input stream. Hence, for both the input streams, we buffer past input as a streaming state, so that we can match every future input with past input and accordingly generate joined results. Furthermore, similar to streaming aggregations, we automatically handle late, out-of-order limiting the state using watermarks.
@@ -778,7 +779,7 @@ At the conceptual level we have 5 main concepts:
 	\item \textbf{Tag set}: other lower-level grouping criteria of data
 	\item \textbf{Field set}: actual data
 	\item \textbf{Timestamp}: time of the data
-Series: data points in time order grouped by measurements and tags
+	\item \textbf{Series}: data points in time order grouped by measurements and tags
 \end{itemize}
 \myparagraph{Logical Level}
 The same 5 concepts at logical level:
@@ -805,7 +806,7 @@ Moreover we know that streams are infinite in nature, while processing can end o
 \myparagraph{Time Series Enrichment \& Advanced Time Series Analytics}
 \textbf{Flux can also be used to enrich your time series data with other SQL data stores} (Postgres, SQLite …) along with cloud-based data stores (Google Bigtable, Amazon Athena...). Enriching time series data provides context that can provide further insights into your data.
 \nline
-Flux also supports advanced time series analytics, in particular we can refer to \textbf{Holt-Winder’s method} which is used for forecasting time series data that exhibits both a trend and a seasonal variation.
+Flux also supports advanced time series analytics, in particular we can refer to \textbf{Holt-Winter’s method} which is used for forecasting time series data that exhibits both a trend and a seasonal variation.
 
 \myparagraph{Supported Window Types}
 Flux supports different window types:
@@ -844,16 +845,49 @@ With web scraping methods, you are in charge of what and how much data you scrap
 \nline
 Advantages:
 \begin{itemize}
-	\item \textbf{Up-to-date data}
+	\item \textbf{Up-to-date data} \\
 When using web scraping, you can be sure that the crawled data is always fresh and relevant. With API, as the database is not updated on regular bases, you might end up having old data. This is impossible with web crawling as you scrape the content right from the screen. You crawl exactly what you see. Also, you can easily verify the data by comparing it with what you see right on the website.
-	\item \textbf{No rate limitations to scraping}
+	\item \textbf{No rate limitations to scraping} \\
 Web scraping is free and has no limits in terms of how much you can scrape. In general, the amount of crawled data is not limited as long as you’re not hammering the website with hundreds of concurrent requests. If you get too harsh, the website can ban you. It can request some forms of verifications like CAPTCHA. However, although it can be tricky, there’s a solution for that as well. In any case, as long as you are following the legal terms of the website data usage, you won’t get into trouble.
-	\item \textbf{Customization and well-structured data}
+	\item \textbf{Customization and well-structured data} \\
 It’s much easier to work with a data crawl method if you are in need of a specific data. Customization is one thing that can be achieved only with web scraping. No other data extraction method can offer such a degree of customized data. You can scrape specific data in your desired format and structure. Also, you can choose the frequency of scraping and even get the geo-specific or device-specific data.
-	\item \textbf{Anonymous}
+	\item \textbf{Anonymous} \\
 Staying anonymous while scraping data is a privilege you get when you use web scraping. You can gather the data and stay private if you want to do so. The website administrator won’t be able to track each step. With API, you often must register to get a key and send it along every time you request data. So it’s practically impossible to stay anonymous while gathering data via APIs.
 \end{itemize}
 These advantages come at a cost: web scraping requires a lot more effort for extracting and collecting data from different web sites, as each of them may have a different structure.
+
+\pagebreak
+
+\myparagraph{API Challenges}
+Main challenges:
+\begin{itemize}
+	\item \textbf{Crawling} \\
+	\uline{Problem}: getting a lot of data points from an API when a call is not enough \\
+	\uline{Solution}: use an API Crawler, a software that methodically interacts with a WebAPI to download data or to take some actions at predefined time intervals
+	\item \textbf{Pagination}: like SQL queries and Web search engines, most APIs support data pagination to split huge chunks of data into smaller set of data. Smaller chunks of data are easier to create, transfer (avoid long response time), cache and require less server computation time \\
+	\uline{Timeline problem}: most of the social networks leverage on the concept of timelines instead of standard pagination to iterate through results. The problem is that data are continuously added to the top of the timeline. So the next request can lead to retrieve the already processed data.  \\
+	\uline{Solution}: the solution is to use the \textbf{cursoring} technique. Instead of reading from the top of the timeline, we read the data relative to the already processed ids
+	\item \textbf{Parallelization}: When possible make parallel requests to gether more data in less time. \\
+	\uline{Example}: get all the media from Instagram about @potus and \#trump \\ 
+	We can make two parallel requests (one for each tag) and paginate the results instead of waiting for the first tag to finish. Some time this is not possible due to the requests interdependency like in pagination; each request depends on the result of previous one
+	\item \textbf{Multiple accounts}: handling multiple accounts can increase the system throughput but increases the complexity of the system.  \\
+	\uline{Strategies to handle multiple accounts:}
+	\begin{itemize}
+		\item Request based
+		\begin{itemize}
+			\item \uline{Round robin based}: the account through which the request is made is chosen using the round robin strategy
+			\item \uline{Account pool}: the account through which the request is made is chosen sequentially until it's rate limit is reached, then we use the next available one
+		\end{itemize}
+		\item Account based
+		\begin{itemize}
+			\item \uline{Requests stack}: this strategy overturn the roles. Now the accounts, in parallel, get the next request to do from the pool. Once an account completes a request the cycle restarts until the pool is empty
+		\end{itemize}
+	\end{itemize}
+	\item \textbf{Fill Gaps}: sometimes the API does not give us all the data we want, so we need to fill those gaps
+\end{itemize}
+
+\pagebreak
+
 \subsection{Data Wrangling: data quality problems, and possible solutions}
 \myparagraph{Data Wrangling}
 \textbf{Data Wrangling is the process of cleaning, structuring and enriching raw data into a desired format for better decision making in less time.} Indeed, the main goal of data wrangling is to \uline{improve data quality.}
@@ -885,11 +919,57 @@ The process steps are:
 	\item \textbf{Shape}: the prepared wrangled data is published using an agreed format so that it can be used further down the line
 \end{itemize}
 
+\myparagraph{Cleansing Techniques}
+Data cleansing is the act of detecting and correcting (or removing) corrupt or inaccurate records from a dataset. The term refers to identifying incomplete, incorrect, partial or irrelevant parts of the data and then replacing, modifying, filling in or deleting this dirty data.
+\nline
+\textbf{Missing Data:}
+\begin{itemize}
+	\item \uline{Detection}: 
+	\begin{itemize}
+		\item check data specifications against data
+		\item  scan individual records
+		\item perform rough checks (number of files, file sizes, number of records)
+	\end{itemize}
+	\item \uline{Hidden damage to data}: 
+	\begin{itemize}
+		\item values are truncated or censored $\rightarrow$ check for spikes and dips in distributions and histograms
+		\item missing values and defaults are indistinguishable $\rightarrow$ metadata or domain expertise can help
+		\item errors of omission (e.g., all calls from a particular area are missing) $\rightarrow$ check if data are missing randomly or are localized in some way
+	\end{itemize}
+	\item \uline{Missing values}:
+	\begin{itemize}
+		\item Random (e.g., system failures, complete miss)
+		\item Wrong Ingestion from CSV to table
+		\item Partial data by nature
+	\end{itemize}
+	\item \uline{Missing value imputation}:
+	\begin{itemize}
+		\item Standalone imputation: use mean, median or other point estimates assuming that the distribution of the missing values is the same as the non-missing values
+		\item Attribute relationships: assuming that all prior attributes are populated, one could resort to regression or propensity score to predict the missing value
+		\item Arbitrary missing pattern: assuming that data is multivariate normal, one could use Markov Chain Monte Carlo to induce monotonicity over data
+	\end{itemize}
+	\item \uline{Censoring and Truncation}:
+	\begin{itemize}
+		\item Censored: Measurement is bounded but not precise (e.g., call duration $>$ 20 are recorded as 20)
+		\item Truncated: Data point dropped if it exceeds or falls below a certain bound (e.g., customers with less than 2 minutes of calling per month)
+	\end{itemize}
+	\item \uline{Suspicious Data and Outliers}:
+	\begin{itemize}
+		\item Error bounds, tolerance limits (using Control charts)
+		\item Model based $\rightarrow$ regression depth, analysis of residual
+		\item Geometric
+		\item Distributional
+		\item Time Series outliers
+	\end{itemize}
+\end{itemize}
+
+\pagebreak
 \section{Crowdsourcing \& Human Computation}
 \myparagraph{Concepts}
-Humans were the first “computers” used for math computations. Then we got “automatic computers”. Now we need hums again for the “AI-complete” tasks (e.g., tag images, determine song genre, check page for offensive content …).
+Humans were the first “computers” used for math computations. Then we got “automatic computers”. Now we need humans again for the “AI-complete” tasks (e.g., tag images, determine song genre, check page for offensive content …).
 \nline
-Human Computation examines cases where humans interact with computers in order to solve a computational problem (usually too hard to be solved by computers alone). \textbf{Crowdsourcing is the way we use people as a source of some kind of information.} Basically, we collect something from humans. Crowdsourcing facilitates human computation (but they are not equivalent). \\
+Human Computation examines cases where humans interact with computers in order to solve a computational problem (usually too hard to be solved by computers alone). \textbf{Crowdsourcing is the way we use people as a source of some kind of information.} Basically, we collect something from humans. Crowdsourcing facilitates human computation (but they are not equivalent). 
+\nline
 \textbf{Amazon Mechanical Turk} is a micro-task based system in which people and businesses can publish small tasks to be completed by a workforce of human performers. Amazon Mechanical Turk serves as a touchpoint between owners and performers. Owners perceive the service and the task completion as if it was artificial intelligence solving tasks. Actually, performers are humans doing tasks. \\
 An example task could ask to classify an “Adult Website”. To build such a classifier, one needs a large number of hand-labeled sites. Indeed, the owner may ask performers to look at a list of sites and classify them as: General Audience, Parental Guidance, Restricted and Porn.
 
@@ -994,8 +1074,213 @@ For what concerns \textbf{altruistic incentives}, \textbf{people feel somehow go
 \nline
 \textbf{One last incentive could be “Fun”. Here gamification plays a big role, since giving people the game feeling helps them have fun.}
 
+\myparagraph{Gamification}
+Gamification is the process of game-thinking and game mechanics to engage users and solve problems. Gamification turns user experience into a game in order to push people to use an application.
+Gamification can be implemented from an individual point of view:
+\begin{itemize}
+	\item \textbf{Intrigue}: The enterprise needs to develop relevant content to keep users engaged.
+	\item \textbf{Challenge}: Users must earn a sense of accomplishment to remain en- gaged,and challenges will tie back to reward and intrigue over time.
+	\item \textbf{Reward}: Both non-monetary and monetary incentives,that match the level of difficulty so users gain a sense of accomplishment.
+\end{itemize}
+or from a social one:
+\begin{itemize}
+	\item \textbf{Status}: Leaderboards codify status in gamification as well as a way to tier users.
+	\item \textbf{Community}: Social is a key part of gamification i.e., connect, share, and reach out.
+\end{itemize}
+Non monetary incentives have tree levels:
+\begin{itemize}
+	\item \textbf{Recognition} (badges,placements,awards...)
+	\item \textbf{Access} (additional features,exclusive events)
+	\item \textbf{Impact} (influence product and business direction)
+\end{itemize}
+An example of a successful gamification campaign is the one made by Lego where users could propose ideas for new products that had a chance of actually being built and released. \nline
+Another effective way of using gamification is using GWAPS,which uses games as a way to perform useful tasks. For example, there are games where the users have to recognize the content of images. The answers to these problems gathered while the users where playing are then collected, stored and become a source of data for the company.
 
+\pagebreak
 
+\section{Bonus: Streaming Data Queries Comparisons}
+\subsection{Q0: sensors that measure a temperature above 20}
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q0}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/ksql_Q0}\hspace*{\fill}
+\end{figure}
+\myparagraph{Spark Structured Streaming}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/sss_Q0}\hspace*{\fill}
+\end{figure}
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q0}\hspace*{\fill}
+\end{figure}
 
+\pagebreak
+
+\subsection{Q1: sensors that observe smoke (smoke=true)}
+
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q1}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/ksql_Q1}\hspace*{\fill}
+\end{figure}
+\myparagraph{Spark Structured Streaming}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/sss_Q1}\hspace*{\fill}
+\end{figure}
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q1}\hspace*{\fill}
+\end{figure}
+
+\pagebreak
+
+\subsection{Q2: the average temperature observed by the sensors}
+
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q2}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/ksql_Q2}\hspace*{\fill}
+\end{figure}
+\myparagraph{Spark Structured Streaming}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/sss_Q2}\hspace*{\fill}
+\end{figure}
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q2}\hspace*{\fill}
+\end{figure}
+
+\pagebreak
+
+\subsection{Q3 (logical sliding window): the average temperature observed by the sensors in the last 4 seconds}
+
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q3}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+Not supported
+\myparagraph{Spark Structured Streaming}
+Not supported
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q3}\hspace*{\fill}
+\end{figure}
+
+\pagebreak
+
+\subsection{Q4 (logical tumbling window): the average temperature observed by the sensors in the last 4 seconds updating the window after 4 seconds}
+
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q4}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/ksql_Q4}\hspace*{\fill}
+\end{figure}
+\myparagraph{Spark Structured Streaming}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/sss_Q4}\hspace*{\fill}
+\end{figure}
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q4}\hspace*{\fill}
+\end{figure} \\
+Saves as a task and execute it every minute
+
+\pagebreak
+
+\subsection{Q5 (phyisical sliding window): the average temperature observed by the sensors in the last 5 events}
+
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q5}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+Not supported
+\myparagraph{Spark Structured Streaming}
+Not supported
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q5}\hspace*{\fill}
+\end{figure}
+
+\pagebreak
+
+\subsection{Q6 (phyisical tumbling window): the average temperature observed by the sensors in the last 5 events updating the window after 5 events}
+
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q6}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+Not supported
+\myparagraph{Spark Structured Streaming}
+Not supported
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q6}\hspace*{\fill}
+\end{figure}
+
+\pagebreak
+
+\subsection{Q7 (logical hopping window): the average temperature observed by the sensors in the last 4 seconds computed every 2 seconds}
+
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q7}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/ksql_Q7}\hspace*{\fill}
+\end{figure}
+\myparagraph{Spark Structured Streaming}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/sss_Q7}\hspace*{\fill}
+\end{figure}
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q7}\hspace*{\fill}
+\end{figure}
+
+\pagebreak
+
+\subsection{Q8 \& Q9: stream-to-stream join and Fire Event detection}
+
+\myparagraph{EPL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/epl_Q8}\hspace*{\fill}
+\end{figure}
+\myparagraph{KSQL}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/ksql_Q8}\hspace*{\fill}
+ \\ \center
+ \hfill \includegraphics[width=400pt]{images/ksql_Q9}\hspace*{\fill}
+\end{figure}
+\pagebreak
+\myparagraph{Spark Structured Streaming}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/sss_Q8}\hspace*{\fill}
+  \\ \center
+   \hfill \includegraphics[width=400pt]{images/sss_Q9}\hspace*{\fill}
+\end{figure}
+\pagebreak
+\myparagraph{Flux}
+\begin{figure}[h!]
+ \hfill \includegraphics[width=400pt]{images/flux_Q8}\hspace*{\fill}
+ \\ \center
+  \hfill \includegraphics[width=400pt]{images/flux_Q9}\hspace*{\fill}
+
+\end{figure}
 
 \end{document}
